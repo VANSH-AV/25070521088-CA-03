@@ -2,6 +2,18 @@ const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
+function fallbackErrorMessage(status) {
+  if (status === 403) {
+    return 'The request was blocked before it reached the FLEXI server. Check that the backend is running on the configured port.';
+  }
+
+  if (status === 502 || status === 503 || status === 504) {
+    return 'The FLEXI server is unavailable. Check that the backend is running and try again.';
+  }
+
+  return 'The request could not be completed.';
+}
+
 export class ApiError extends Error {
   constructor(message, { status = 0, code = 'REQUEST_FAILED', fields = null } = {}) {
     super(message);
@@ -67,7 +79,7 @@ async function requestPayload(path, { method = 'GET', body, signal } = {}) {
   const payload = await readPayload(response);
 
   if (!response.ok) {
-    throw new ApiError(payload?.error?.message || 'The request could not be completed.', {
+    throw new ApiError(payload?.error?.message || fallbackErrorMessage(response.status), {
       status: response.status,
       code: payload?.error?.code || 'REQUEST_FAILED',
       fields: payload?.error?.fields || null,

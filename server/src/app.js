@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import { getDatabaseState } from './config/db.js';
 import { env } from './config/env.js';
 import { errorHandler, notFound } from './errors/errorHandler.js';
 import { AppError } from './errors/AppError.js';
@@ -23,6 +24,15 @@ function corsOrigin(origin, callback) {
   }
 
   return callback(new AppError(403, 'FORBIDDEN', 'The request origin is not allowed.'));
+}
+
+function requireDatabase(req, res, next) {
+  if (getDatabaseState() === 'connected') {
+    return next();
+  }
+
+  res.setHeader('X-Database-Ready', 'false');
+  return next(new AppError(503, 'SERVICE_UNAVAILABLE', 'The database is unavailable.'));
 }
 
 export function createApp({
@@ -65,10 +75,10 @@ export function createApp({
   app.use(express.json({ limit: '100kb', strict: true }));
 
   app.use('/api', createHealthRouter({ databaseHealth }));
-  app.use('/api/auth', createAuthRouter({ rateLimits: authRateLimits }));
-  app.use('/api/users', createUserRouter());
-  app.use('/api/projects', createProjectRouter());
-  app.use('/api/contact', createContactRouter({ rateLimits: contactRateLimits }));
+  app.use('/api/auth', requireDatabase, createAuthRouter({ rateLimits: authRateLimits }));
+  app.use('/api/users', requireDatabase, createUserRouter());
+  app.use('/api/projects', requireDatabase, createProjectRouter());
+  app.use('/api/contact', requireDatabase, createContactRouter({ rateLimits: contactRateLimits }));
 
   app.use(notFound);
   app.use(errorHandler);

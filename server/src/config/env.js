@@ -3,10 +3,12 @@ import dotenv from 'dotenv';
 import { z } from 'zod';
 import { isDuration } from '../utils/duration.js';
 
-dotenv.config({
-  path: fileURLToPath(new URL('../../.env', import.meta.url)),
-  quiet: true,
-});
+if (process.env.NODE_ENV !== 'test') {
+  dotenv.config({
+    path: fileURLToPath(new URL('../../.env', import.meta.url)),
+    quiet: true,
+  });
+}
 
 const trustProxyFromEnv = z
   .string()
@@ -31,7 +33,7 @@ const trustProxyFromEnv = z
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-    PORT: z.coerce.number().int().min(1).max(65535).default(5000),
+    PORT: z.coerce.number().int().min(1).max(65535).default(5050),
     TRUST_PROXY: trustProxyFromEnv,
     CLIENT_ORIGIN: z
       .string()
@@ -120,7 +122,14 @@ if (!parsed.success) {
     .map((issue) => `${issue.path.join('.') || 'env'}: ${issue.message}`)
     .join('\n');
 
-  throw new Error(`Invalid environment configuration:\n${details}`);
+  throw new Error(
+    [
+      'Invalid environment configuration:',
+      details,
+      '',
+      'Create server/.env from server/.env.example, then set MONGODB_URI and a JWT_SECRET of at least 32 characters.',
+    ].join('\n'),
+  );
 }
 
 const data = parsed.data;

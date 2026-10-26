@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| Base URL (planned) | `http://localhost:5000/api` in development; `/api` in production |
+| Base URL | `http://127.0.0.1:5050/api` directly in development; `/api` through the Vite proxy or production origin |
 | Protocol | HTTPS in production; JSON request/response |
 | Authentication | JWT in `httpOnly` cookie `flexi_token`; optional `Authorization: Bearer <token>` for API clients/tests |
 | Status | Phase 4 slice implemented: health, authentication, profiles, projects, and public contact; later endpoint groups remain planned |
@@ -202,7 +202,7 @@ Return `429 RATE_LIMITED` with `Retry-After`. Rate-limit responses must not reve
 | Success | `200 { success: true, data: { status: "ok", database: "connected", uptimeSeconds } }` |
 | Errors | `503 SERVICE_UNAVAILABLE` when the database ping fails |
 | Mongo | `db.admin().ping()` or `mongoose.connection.db.admin().ping()` |
-| Notes | No secrets, versions of dependencies, or connection strings in the response |
+| Notes | No secrets, versions of dependencies, or connection strings in the response. Feature routes return `503` with `X-Database-Ready: false` before controller execution when MongoDB is disconnected. |
 
 ---
 

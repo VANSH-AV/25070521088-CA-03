@@ -43,7 +43,7 @@ describe('environment validation', () => {
 
     expect(result.status).toBe(0);
     expect(JSON.parse(result.stdout)).toEqual({
-      port: 5000,
+      port: 5050,
       origins: ['http://localhost:5173'],
     });
   });

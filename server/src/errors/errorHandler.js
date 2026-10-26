@@ -74,9 +74,14 @@ function normalizeError(error) {
   }
 
   if (
-    ['MongooseServerSelectionError', 'MongoServerSelectionError', 'MongoNetworkError'].includes(
-      error?.name,
-    )
+    [
+      'MongooseServerSelectionError',
+      'MongoServerSelectionError',
+      'MongoNetworkError',
+      'MongoNotConnectedError',
+    ].includes(error?.name) ||
+    (error?.name === 'MongooseError' &&
+      /before initial connection|not connected/i.test(error?.message || ''))
   ) {
     return new AppError(503, 'SERVICE_UNAVAILABLE', 'The database is unavailable.');
   }

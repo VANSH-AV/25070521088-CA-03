@@ -90,6 +90,17 @@ npm run build
 
 A root-level combined command is not required because the root must contain only the two application folders. CI can run each folder as a separate job.
 
+### Local runtime
+
+1. Start MongoDB on `127.0.0.1:27017` with Docker (`mongo:8`), a local `mongod`, or an Atlas URI.
+2. Create `server/.env` from `server/.env.example`. Set `MONGODB_URI` and a `JWT_SECRET` of at least 32 characters; generate one with `openssl rand -base64 48`. Never commit `.env`.
+3. Run `cd server && npm run dev`. The API defaults to port `5050`; port `5000` is commonly occupied by macOS AirPlay Receiver.
+4. Check `curl http://127.0.0.1:5050/api/health`. It returns `200` only when MongoDB is connected and `503` otherwise.
+5. Run `cd client && npm run dev -- --host 127.0.0.1 --port 4173`. The Vite proxy defaults to `http://127.0.0.1:5050`.
+6. If the API uses another port, start Vite with the matching proxy: `VITE_API_PROXY=http://127.0.0.1:<port> npm run dev -- --host 127.0.0.1 --port 4173`.
+
+When the proxy target is unavailable, Vite returns a `502` JSON error so the UI reports that the FLEXI server is unavailable instead of a generic failure. Feature routes also return `503` with `X-Database-Ready: false` when MongoDB is disconnected.
+
 ---
 
 ## 4. Unit test coverage
@@ -422,7 +433,7 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 - [x] Cookie attributes verified.
 - [x] Rate limit verified.
 
-**Evidence:** the full backend suite now passes 72 tests, including registration/login/logout/password-change, token tampering/expiry/scope, cookie attributes, CSRF rejection, authorization guards, and login rate limiting. Client lint/build pass. Browser verification covered signup, session persistence after refresh, logout, protected-route redirect with safe `returnTo`, invalid-login errors, and mobile layout. Cookie `Secure` is covered by production environment validation; the browser run used local HTTP cookies. Password show/hide remains a later UI checklist item.
+**Evidence:** the full backend suite now passes 74 tests, including registration/login/logout/password-change, token tampering/expiry/scope, cookie attributes, CSRF rejection, authorization guards, and login rate limiting. Client lint/build pass. Browser verification covered signup, session persistence after refresh, logout, protected-route redirect with safe `returnTo`, invalid-login errors, and mobile layout. Cookie `Secure` is covered by production environment validation; the browser run used local HTTP cookies. Password show/hide remains a later UI checklist item.
 
 ### Phase 5 — Public site
 
@@ -447,8 +458,8 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 ### Product Phase 4 — Public studio delivery
 
 - [x] Client lint, 7 client unit tests, and production build pass.
-- [x] Backend lint and full test suite pass: 6 files, 72 tests.
-- [x] Coverage run passes at 87.4% statements, 75.44% branches, 90.25% functions, and 87.43% lines.
+- [x] Backend lint and full test suite pass: 6 files, 74 tests.
+- [x] Coverage run passes at 87.73% statements, 75.95% branches, 90.96% functions, and 87.77% lines.
 - [x] `npm audit` reports 0 vulnerabilities in both client and server.
 - [x] Browser flow covers registration, login, project creation, discovery, public profile, profile update, manage list, edit, archive, contact, and 404.
 - [x] Final focused browser verification passes all 33 affected-flow checks plus 11 regression checks, including timezone-aware dates, closed-team semantics, archived `409`, and dashboard navigation.
@@ -457,9 +468,10 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 - [x] Non-recruiting projects show `Not recruiting`, expose zero open slots from the API, and offer no application action while applications remain out of Phase 4 scope.
 - [x] Dashboard navigation selects exactly one item: Overview, Discover, My projects, or Profile, including create/edit routes under My projects.
 - [x] Desktop and 390 px visual review completed for affected dashboard, create, discovery, and project-detail flows.
+- [x] Local runtime at `http://127.0.0.1:4173` proxies to the API on `5050`; empty discovery, registration, refresh hydration, project create/discovery, logout, protected redirect, and invalid login are browser-verified against MongoDB.
 - [ ] Automated frontend component/E2E suites exist; deferred until Vitest/React Testing Library and a browser-test dependency are added. Current coverage is 7 Node utility tests plus headless browser verification scripts.
 
-**Evidence:** `npm run lint`, `npm test`, `npm run build`, `npm run test:coverage`, and both `npm audit` runs pass. The headless browser runs used an isolated QA server against ephemeral MongoDB: 33 affected-flow checks covered 1440 px and 390 px layouts plus `Pacific/Kiritimati` and `America/Adak` contexts, and 11 regression checks covered archived `409`, settings, management, contact, edit, and 404. Screenshots are stored under the Phase 4 QA artifact directory. Automated component/E2E suites remain deferred; the 7 client tests cover pure formatting, availability, and route-selection logic.
+**Evidence:** `npm run lint`, `npm test`, `npm run build`, `npm run test:coverage`, and both `npm audit` runs pass. The headless browser runs used an isolated QA server against ephemeral MongoDB: 33 affected-flow checks covered 1440 px and 390 px layouts plus `Pacific/Kiritimati` and `America/Adak` contexts, and 11 regression checks covered archived `409`, settings, management, contact, edit, and 404. A separate 18-check run at the actual local URL `http://127.0.0.1:4173` verified empty discovery, registration `201`, HttpOnly session cookies, refresh hydration, project creation and public discovery, logout `204`, protected-route redirect, and invalid login `401`. Screenshots are stored under the Phase 4 QA artifact directory. Automated component/E2E suites remain deferred; the 7 client tests cover pure formatting, availability, and route-selection logic.
 
 ### Phase 7 — Team formation
 

@@ -80,6 +80,20 @@ describe('FLEXI API shell', () => {
     expect(response.headers['x-request-id']).toEqual(expect.any(String));
   });
 
+  it('returns 503 from database-backed routes when the database is unavailable', async () => {
+    const app = createApp({
+      databaseHealth: () => Promise.resolve({ connected: false, state: 'disconnected' }),
+    });
+    const response = await request(app).get('/api/projects?limit=3');
+
+    expect(response.status).toBe(503);
+    expect(response.headers['x-database-ready']).toBe('false');
+    expect(response.body.error).toEqual({
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'The database is unavailable.',
+    });
+  });
+
   it('rejects malformed JSON with a consistent error response', async () => {
     const app = createApp({ databaseHealth: connectedDatabase });
     const response = await request(app)
@@ -219,6 +233,24 @@ describe('request validation', () => {
 });
 
 describe('central error mapping', () => {
+  it('maps an unconnected Mongoose query to 503', () => {
+    const dbApp = express();
+    dbApp.get('/db', () => {
+      const error = new Error('Cannot call `projects.find()` before initial connection is complete.');
+      error.name = 'MongooseError';
+      throw error;
+    });
+    dbApp.use(errorHandler);
+
+    return request(dbApp)
+      .get('/db')
+      .expect(503)
+      .expect((response) => {
+        expect(response.body.error.code).toBe('SERVICE_UNAVAILABLE');
+        expect(response.body.error.message).toBe('The database is unavailable.');
+      });
+  });
+
   it('maps Mongoose-style cast and validation failures', () => {
     const castApp = express();
     castApp.get('/cast', () => {

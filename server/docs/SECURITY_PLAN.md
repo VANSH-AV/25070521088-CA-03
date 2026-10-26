@@ -88,7 +88,7 @@ Browser (untrusted)  ──HTTPS──>  Express API (trusted server)  ──TLS
 | Variable | Example placeholder | Notes |
 | --- | --- | --- |
 | `NODE_ENV` | `development` | `development`, `test`, `production` |
-| `PORT` | `5000` | API port |
+| `PORT` | `5050` | API port; avoid macOS AirPlay Receiver on `5000` |
 | `MONGODB_URI` | `mongodb+srv://<user>:<pass>@<cluster>/flexi_dev` | Never commit the real URI |
 | `JWT_SECRET` | `<48+ random bytes, base64>` | Generate with a random generator; at least 32 bytes of entropy |
 | `JWT_EXPIRES_IN` | `7d` | Keep cookie maxAge in sync |
