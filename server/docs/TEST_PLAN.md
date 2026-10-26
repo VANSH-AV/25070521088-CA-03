@@ -657,12 +657,14 @@ A release candidate is ready only when:
 
 For this phase, the required evidence is intentionally documentation-focused:
 
-- [ ] Reference repository and ZIP inspected.
-- [ ] Working directory and Git state recorded.
-- [ ] Six planning documents present in the two app folders.
-- [ ] Two top-level application folders only (plus hidden Git metadata).
-- [ ] No application feature code or dependencies added.
-- [ ] `git diff --stat` / staged file review completed.
-- [ ] Secret scan pattern review completed.
-- [ ] Local Phase 0 commit hash recorded.
-- [ ] Push status stated truthfully; no remote guessed or pointed at the reference.
+- [x] Reference repository and ZIP inspected.
+- [x] Working directory and Git state recorded.
+- [x] Six planning documents present in `client/docs/` and `server/docs/`.
+- [x] Two top-level application folders only (plus hidden Git metadata); they are now `client/` and `server/`.
+- [x] No application feature code or dependencies added in the Phase 0 commit.
+- [x] `git diff --stat` / staged file review completed.
+- [x] Secret scan pattern review completed.
+- [x] Local Phase 0 commit hash recorded: `6b6b724`.
+- [x] Push status stated truthfully; no remote guessed or pointed at the reference.
+
+**Evidence:** Phase 0 was originally committed with `Frontend-client/` and `Backend-server/`; Phase 1 renamed them to `client/` and `server/` with no extra top-level folder. Current top-level layout is exactly `client/` and `server/` plus `.git/`. No remote exists and no push has been attempted.

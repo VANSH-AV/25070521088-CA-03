@@ -4,10 +4,10 @@
 | --- | --- |
 | Product | FLEXI — Student Project Collaboration Studio |
 | Design direction | Editorial studio meets campus workshop |
-| Phase | Phase 1 — design system and preview implemented; feature pages not started |
+| Phase | Phase 1 — design system and preview implemented; Phase 2 backend/data layer complete; feature pages not started |
 | Related plans | `../../server/docs/PROJECT_PLAN.md`, `API_PLAN.md`, `DATABASE_PLAN.md`, `SECURITY_PLAN.md` |
 
-> This document defines the visual system, page map, component inventory, states, and accessibility expectations for later phases. Phase 1 implements the tokens, primitives, states, and a labeled preview page; feature pages and live data remain future work.
+> This document defines the visual system, page map, component inventory, states, and accessibility expectations for later phases. Phase 1 implements the tokens, primitives, states, and a labeled preview page. Phase 2 adds the backend foundation and MongoDB models in `server/` but does not connect the client to feature APIs; feature pages and live data remain future work.
 
 ---
 
@@ -778,7 +778,7 @@ Phase 1 intentionally keeps primitives in one `ui.jsx` module so the foundation 
 - Headless browser contrast and layout checks at 320/360/390/768/1024/1280/1440.
 - No feature-specific page implementation beyond the gallery and shared preview shell.
 
-**Verification:** `npm run lint` and `npm run build` pass; browser QA reports no console errors, failed requests, or horizontal overflow. See `../../server/docs/TEST_PLAN.md` for evidence. Automated component render tests are deferred until Phase 2 adds the test tooling.
+**Verification:** `npm run lint` and `npm run build` pass; browser QA reports no console errors, failed requests, or horizontal overflow. See `../../server/docs/TEST_PLAN.md` for evidence. Phase 2 added backend test tooling only; automated frontend component and E2E tests remain deferred to a later frontend phase.
 
 **Design non-goals for MVP**
 

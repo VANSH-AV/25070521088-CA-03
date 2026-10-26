@@ -6,7 +6,7 @@
 | Phase | Phase 2 — Backend foundation and data layer |
 | Status | Phase 1 committed; Phase 2 backend/data-layer foundation implemented and locally verified; authentication and feature APIs not started |
 | Date | 2026-10-26 |
-| Repository state | New local repository; Phase 0 committed; no personal remote configured yet |
+| Repository state | Local repository with Phases 0, 1, and 2 committed; no personal remote configured |
 | Related plans | `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md`, `TEST_PLAN.md`, `../../client/docs/UI_UX_PLAN.md` |
 
 > Feature and API behavior in this document remains **planned**. Phase 1 implements the frontend design foundation and a labeled preview page. Phase 2 adds the backend shell, health/error handling, MongoDB connection, nine Mongoose models with indexes, and backend tests; authentication, seed data, and feature workflows are not connected yet.
@@ -499,12 +499,14 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | --- | --- |
 | Objective | Inspect the reference, define scope, architecture, security, testing, and Git process |
 | Dependencies | None |
-| Planned file changes | This document set; per-app `.gitignore` files; two required folders |
+| Planned file changes | This document set; per-app `.gitignore` files; the `client/` and `server/` folders |
 | Deliverables | Six planning documents; reference audit; local Phase 0 commit |
 | Acceptance criteria | Documents exist, are internally consistent, and contain no secrets or application code |
 | Required tests | Document/link review; folder-structure check; secret scan; `git diff` review |
 | Risks and mitigation | Assumptions may change; record open questions and re-baseline before each phase |
 | Definition of done | Plan reviewed, committed locally, push blocked until a personal remote is confirmed |
+
+**Phase 0 status (2026-10-26):** Complete and committed as `6b6b724`. Planning files were originally created under `Frontend-client/` and `Backend-server/`; Phase 1 renamed those top-level folders to `client/` and `server/` without adding a third root folder. Current implementation status: Phase 1 (`d934731`) provides the design-preview client, and Phase 2 (`a2cf72f`) provides the backend foundation and data layer. Authentication, seed data, transactions, and feature APIs remain pending.
 
 ### Phase 1 — UI/UX design system
 
