@@ -1,0 +1,81 @@
+:root {
+  color-scheme: light;
+
+  --ink-950: #0b0f14;
+  --ink-900: #121820;
+  --ink-700: #2b3440;
+  --slate-600: #566170;
+  --slate-400: #8a94a3;
+  --bone-50: #f8f5ee;
+  --bone-100: #f0ebe0;
+  --bone-200: #e4dccb;
+  --white: #ffffff;
+  --cobalt-700: #1b36b8;
+  --cobalt-600: #2447e8;
+  --cobalt-100: #e6eaff;
+  --tangerine-500: #ff6b3d;
+  --tangerine-600: #e85a30;
+  --tangerine-100: #ffe8df;
+  --mint-700: #157a5b;
+  --mint-100: #dff5ec;
+  --amber-700: #8a4b08;
+  --amber-100: #fef3c7;
+  --rose-700: #a3242e;
+  --rose-800: #7f1b23;
+  --rose-100: #fde8ea;
+  --focus: #2447e8;
+
+  --font-display: "Bricolage Grotesque", "Arial Black", sans-serif;
+  --font-body: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --text-display-xl: clamp(3rem, 7.1vw, 5rem);
+  --text-display-lg: clamp(2.6rem, 5.2vw, 4rem);
+  --text-h1: clamp(2.35rem, 4.2vw, 3.5rem);
+  --text-h2: clamp(2rem, 3.6vw, 2.6rem);
+  --text-h3: clamp(1.35rem, 2vw, 1.75rem);
+  --text-h4: clamp(1.1rem, 1.4vw, 1.3rem);
+  --text-body-lg: clamp(1.0625rem, 1.25vw, 1.15rem);
+  --text-body: 1rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
+  --text-micro: 0.6875rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  --container: 77.5rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --section-y: clamp(4rem, 8vw, 7.5rem);
+  --header-height: 4.75rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-pill: 999px;
+
+  --border-soft: rgba(11, 15, 20, 0.07);
+  --border: 1px solid rgba(11, 15, 20, 0.1);
+  --border-strong: 1px solid rgba(11, 15, 20, 0.18);
+  --shadow-1: 0 1px 2px rgba(11, 15, 20, 0.06);
+  --shadow-2: 0 8px 24px rgba(11, 15, 20, 0.08);
+  --shadow-3: 0 24px 64px rgba(11, 15, 20, 0.14);
+
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-slow: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --z-header: 50;
+  --z-toast: 80;
+  --z-skip: 100;
+}

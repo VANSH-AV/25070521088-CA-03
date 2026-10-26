@@ -76,10 +76,10 @@ Browser (untrusted)  ──HTTPS──>  Express API (trusted server)  ──TLS
 
 ### 2.1 Environment files
 
-- `Backend-server/.env` is local-only and **must be ignored by Git**.
-- `Backend-server/.env.example` is committed with placeholders and explanatory comments.
-- `Frontend-client/.env` is local-only; `Frontend-client/.env.example` is committed.
-- The root `.gitignore` already excludes `.env`, `.env.*`, keys, builds, logs, coverage, and `node_modules`.
+- `server/.env` is local-only and **must be ignored by Git**.
+- `server/.env.example` is committed with placeholders and explanatory comments.
+- `client/.env` is local-only; `client/.env.example` is committed.
+- The per-app `.gitignore` files in `client/` and `server/` exclude `.env`, `.env.*`, keys, builds, logs, coverage, and `node_modules`.
 - Never create a second secrets file outside the two app folders.
 - Never put secrets in `VITE_*` variables. Vite variables are compiled into the browser bundle and are public.
 
@@ -461,7 +461,7 @@ External links in projects are user-supplied; validate schemes, add `rel="noopen
 
 ## 13. Git and repository security
 
-- The root `.gitignore` excludes `.env`, `.env.*`, `node_modules`, builds, coverage, logs, local database data, and uploaded files. `.env.example` is allowed.
+- The per-app `.gitignore` files exclude `.env`, `.env.*`, `node_modules`, builds, coverage, logs, local database data, and uploaded files. `.env.example` is allowed.
 - Never commit real credentials, even temporarily. Assume any committed secret is compromised.
 - Before every commit, inspect `git status` and `git diff`; run a secret scan for common patterns.
 - Do not push to the reference repository. Use only the user's confirmed personal repository.

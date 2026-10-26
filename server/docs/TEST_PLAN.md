@@ -4,7 +4,7 @@
 | --- | --- |
 | Purpose | Define how FLEXI is verified from Phase 0 through deployment |
 | Test stack (planned) | Vitest, Supertest, mongodb-memory-server, React Testing Library, MSW, Playwright, axe |
-| Status | Planned; no test suite exists in Phase 0 |
+| Status | Phase 1 UI verification complete via lint/build and headless browser QA; automated component/E2E suites still planned |
 | Related plans | `PROJECT_PLAN.md`, `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md` |
 
 > No test, build, or deployment claim is valid unless the result was observed. This plan defines the evidence required at each phase.
@@ -69,7 +69,7 @@ Application acceptance uses a MongoDB transaction. Standalone MongoDB does not s
 
 These scripts are planned for Phase 2/11 and must be documented in each package.
 
-**Backend (`Backend-server`)**
+**Backend (`server`)**
 
 ```bash
 npm run lint
@@ -80,7 +80,7 @@ npm run db:indexes       # verify/create indexes
 npm run seed:test        # seed a safe test database
 ```
 
-**Frontend (`Frontend-client`)**
+**Frontend (`client`)**
 
 ```bash
 npm run lint
@@ -375,22 +375,25 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 
 ### Phase 0 — Planning
 
-- [ ] Planning documents exist and are internally consistent.
-- [ ] Exactly two top-level application folders exist.
-- [ ] No app code, `node_modules`, `.env`, or secret is committed.
-- [ ] `git diff` of the planning commit reviewed.
-- [ ] Push not attempted without a confirmed personal remote.
+- [x] Planning documents exist and are internally consistent.
+- [x] Exactly two top-level application folders exist.
+- [x] No app code, `node_modules`, `.env`, or secret is committed.
+- [x] `git diff` of the planning commit reviewed.
+- [x] Push not attempted without a confirmed personal remote.
 
-**Evidence:** file listing, document review, Git status/diff, commit hash, explicit push status.
+**Evidence:** file listing, document review, Git status/diff, Phase 0 commit `6b6b724`, explicit push status.
 
 ### Phase 1 — Design system
 
-- [ ] Tokens and primitives render.
-- [ ] All interactive states exist.
-- [ ] Contrast and focus checks pass.
-- [ ] Design preview is usable at 320/768/1440.
+- [x] Tokens and primitives render.
+- [x] All interactive states exist, including dialog, toast, loading, disabled, empty, success, and error.
+- [x] Contrast and focus checks pass.
+- [x] Design preview is usable at 320/768/1440 and tested at 360/390/1024/1280 as well.
+- [x] No horizontal overflow, console errors, or failed requests at tested widths.
+- [x] Reduced-motion behavior verified.
+- [x] Mobile navigation, anchor focus, form validation, toast, and dialog keyboard behavior verified.
 
-**Evidence:** component tests, screenshots, manual a11y notes.
+**Evidence:** `npm run lint`, `npm run build`, headless browser QA output, screenshots, manual a11y notes. Automated component/E2E test tooling is deferred to Phase 2 scaffolding.
 
 ### Phase 2 — Scaffolding
 
@@ -653,7 +656,7 @@ For this phase, the required evidence is intentionally documentation-focused:
 - [ ] Reference repository and ZIP inspected.
 - [ ] Working directory and Git state recorded.
 - [ ] Six planning documents present in the two app folders.
-- [ ] Two top-level application folders only (plus hidden Git metadata and root `.gitignore`).
+- [ ] Two top-level application folders only (plus hidden Git metadata).
 - [ ] No application feature code or dependencies added.
 - [ ] `git diff --stat` / staged file review completed.
 - [ ] Secret scan pattern review completed.

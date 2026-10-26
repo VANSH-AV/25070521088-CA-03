@@ -4,10 +4,10 @@
 | --- | --- |
 | Product | FLEXI — Student Project Collaboration Studio |
 | Design direction | Editorial studio meets campus workshop |
-| Phase | Phase 0 — direction only; no final interface implemented |
-| Related plans | `../../Backend-server/docs/PROJECT_PLAN.md`, `API_PLAN.md`, `DATABASE_PLAN.md`, `SECURITY_PLAN.md` |
+| Phase | Phase 1 — design system and preview implemented; feature pages not started |
+| Related plans | `../../server/docs/PROJECT_PLAN.md`, `API_PLAN.md`, `DATABASE_PLAN.md`, `SECURITY_PLAN.md` |
 
-> This document defines the visual system, page map, component inventory, states, and accessibility expectations for later phases. Phase 0 does not build the finished UI.
+> This document defines the visual system, page map, component inventory, states, and accessibility expectations for later phases. Phase 1 implements the tokens, primitives, states, and a labeled preview page; feature pages and live data remain future work.
 
 ---
 
@@ -241,10 +241,10 @@ Avoid decorative scripts, all-caps body copy, and more than three weights in one
 
 Keep the architecture small enough to explain in a viva. Use React Router for routing, one auth context, a typed-by-convention API service layer, and page-local state. Do not introduce Redux, React Query, or a design framework unless a concrete problem justifies it.
 
-**Planned folder structure (not created in Phase 0):**
+**Planned full-app structure (Phase 1 creates only the foundation described in section 12):**
 
 ```text
-Frontend-client/
+client/
   index.html
   vite.config.js
   package.json
@@ -257,6 +257,7 @@ Frontend-client/
       tokens.css
       global.css
       components.css
+      preview.css
       pages/
     layouts/
       PublicLayout.jsx
@@ -527,7 +528,7 @@ Frontend-client/
 
 ## 6. Component inventory
 
-Components are planned for `Frontend-client/src/components/` (Phase 1+). Every interactive component needs default, hover, focus-visible, active, disabled, and where relevant loading/error states.
+Components are planned for `client/src/components/` (Phase 1+). Every interactive component needs default, hover, focus-visible, active, disabled, and where relevant loading/error states.
 
 ### 6.1 Layout and navigation
 
@@ -747,36 +748,37 @@ Target **WCAG 2.1 AA** for core journeys.
 
 ---
 
-## 12. Design system implementation plan (Phase 1)
+## 12. Design system implementation (Phase 1, implemented)
 
-**Planned file structure (not created in Phase 0):**
+**Implemented structure:**
 
 ```text
-Frontend-client/
+client/
   src/
     styles/
       tokens.css          # colors, type scale, spacing, radii, shadows, motion
-      global.css          # reset, base elements, focus, utilities, skip link
-      components.css      # shared primitive styles (or component-scoped files)
+      global.css          # reset, base elements, focus, skip link
+      components.css      # shared primitive and state styles
+      preview.css         # preview page layout and responsive behavior
     components/
-      ui/                 # Button, Input, Badge, Avatar, Card, Modal, Toast...
-      layout/             # PublicLayout, DashboardLayout, WorkspaceLayout
-      project/            # ProjectCard, ProjectGrid, ApplicationCard...
-      workspace/          # TaskItem, TaskBoard, MilestoneTimeline...
-      admin/              # ModerationTable, ReportQueue, MessageInbox...
-    pages/
-      design/DesignPreview.jsx  # dev-only token/component gallery
+      ui.jsx              # Button, TextField, Badge, Avatar, Card, Dialog, Toast...
+      icons.jsx           # inline icon set
+    App.jsx               # labeled design-preview composition
 ```
 
-**Phase 1 deliverables**
+Phase 1 intentionally keeps primitives in one `ui.jsx` module so the foundation stays reviewable. Split it into feature folders only when real page boundaries exist.
+
+**Phase 1 deliverables — implemented**
 
 - CSS custom properties for the palette, type scale, spacing, radii, shadows, motion, and z-index.
-- Global reset, base typography, focus treatment, selection color, scrollbar styling (subtle).
-- Primitive components with all states and responsive behavior.
-- A dev-only design preview page showing colors, type, buttons, inputs, cards, badges, states, and overlays.
-- Fonts loaded with `display=swap` and sensible fallbacks; self-host if feasible, otherwise Google Fonts with preconnect.
-- Automated contrast check and component render tests.
-- No feature-specific page implementation in Phase 1 beyond the gallery and shared shells.
+- Global reset, base typography, focus treatment, selection color, and skip link.
+- Primitive components with keyboard, hover, active, disabled, loading, error, empty, success, and responsive behavior.
+- A design preview page showing colors, type, actions, cards, badges, avatars, progress, fields, alerts, dialog, toast, and states.
+- Fonts loaded with `display=swap` and fallbacks; Google Fonts with preconnect.
+- Headless browser contrast and layout checks at 320/360/390/768/1024/1280/1440.
+- No feature-specific page implementation beyond the gallery and shared preview shell.
+
+**Verification:** `npm run lint` and `npm run build` pass; browser QA reports no console errors, failed requests, or horizontal overflow. See `../../server/docs/TEST_PLAN.md` for evidence. Automated component render tests are deferred until Phase 2 adds the test tooling.
 
 **Design non-goals for MVP**
 
@@ -793,12 +795,12 @@ Frontend-client/
 
 ### Design system
 
-- [ ] Palette, type, spacing, radius, shadow, and motion tokens are implemented once and reused.
-- [ ] Buttons, inputs, cards, badges, avatars, modals, toasts, and empty/error/loading states exist.
-- [ ] Focus-visible, hover, active, disabled, and loading states are visually distinct.
-- [ ] Contrast checks pass for body text, buttons, badges, and form boundaries.
-- [ ] Reduced-motion behavior is implemented.
-- [ ] No component relies on color alone to communicate status.
+- [x] Palette, type, spacing, radius, shadow, and motion tokens are implemented once and reused.
+- [x] Buttons, inputs, cards, badges, avatars, dialogs, toasts, and empty/error/loading states exist.
+- [x] Focus-visible, hover, active, disabled, and loading states are visually distinct.
+- [x] Contrast checks pass for body text, buttons, badges, and form boundaries.
+- [x] Reduced-motion behavior is implemented.
+- [x] No component relies on color alone to communicate status.
 
 ### Public pages
 
@@ -827,8 +829,8 @@ Frontend-client/
 
 ### Quality
 
-- [ ] Keyboard-only and screen-reader spot checks pass.
-- [ ] No horizontal scroll at 320 px except intentional board/table containers.
-- [ ] Loading skeletons reserve space and do not cause layout shift.
-- [ ] Errors preserve user input and offer a next action.
-- [ ] Copy is specific and free of lorem ipsum.
+- [ ] Keyboard-only and screen-reader spot checks pass. Keyboard checks pass for the skip link, menu, form, toast, and dialog; screen-reader testing is still pending feature pages.
+- [x] No horizontal scroll at 320 px except intentional board/table containers.
+- [x] Loading skeletons reserve space and do not cause layout shift.
+- [x] Errors preserve user input and offer a next action.
+- [x] Copy is specific and free of lorem ipsum.

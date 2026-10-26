@@ -34,7 +34,7 @@ Raw `mongodb` operations may still be used for aggregations and index diagnostic
 
 ### 1.2 Hard constraints
 
-- No application folder besides `Frontend-client/` and `Backend-server/`.
+- No application folder besides `client/` and `server/`.
 - No `node_modules` in Git.
 - No plaintext passwords, JWT secrets, or connection strings in code or documentation examples.
 - No unbounded arrays: team membership is capped by `teamSize` (max 12), skills/tags are capped by validation.
@@ -742,7 +742,7 @@ db.projects.findOne({
 
 ## 9. Seed data plan
 
-The seed script lives in `Backend-server/src/scripts/seed.js` (Phase 3) and must be safe and repeatable.
+The seed script lives in `server/src/scripts/seed.js` (Phase 3) and must be safe and repeatable.
 
 - Uses `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` from the environment; no password is hard-coded or committed.
 - Demo student password comes from `SEED_DEMO_PASSWORD`; if absent, the script refuses to run and explains the requirement.

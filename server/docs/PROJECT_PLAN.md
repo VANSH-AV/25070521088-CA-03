@@ -3,13 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Product | FLEXI — Student Project Collaboration Studio |
-| Phase | Phase 0 — Requirements and Planning |
-| Status | Planning complete; implementation not started |
+| Phase | Phase 1 — UI/UX design system |
+| Status | Phase 1 implemented and locally verified; Phase 2 not started |
 | Date | 2026-10-26 |
-| Repository state | New local repository; no personal remote configured yet |
-| Related plans | `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md`, `TEST_PLAN.md`, `../../Frontend-client/docs/UI_UX_PLAN.md` |
+| Repository state | New local repository; Phase 0 committed; no personal remote configured yet |
+| Related plans | `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md`, `TEST_PLAN.md`, `../../client/docs/UI_UX_PLAN.md` |
 
-> Every feature and endpoint in this document is **planned**, not implemented. Phase 0 deliberately contains no application code.
+> Feature and API behavior in this document remains **planned**. Phase 1 implements only the frontend design foundation and a labeled preview page; no backend, database, authentication, or feature workflow is connected.
 
 ---
 
@@ -17,7 +17,7 @@
 
 FLEXI is a full-stack MERN web application where college students publish project ideas, discover work worth joining, find teammates with complementary skills, apply to teams, coordinate tasks and milestones, and present completed work as evidence of their abilities.
 
-The reference project proves a basic React + Express + MongoDB setup, but it is a teaching scaffold rather than a product: it has placeholder pages, a single `student` collection, no authorization middleware, hard-coded secrets, no validation, and no tests. FLEXI preserves the two-part `Frontend-client` / `Backend-server` architecture and the approachable JavaScript stack, while replacing the weak parts with a documented, testable design.
+The reference project proves a basic React + Express + MongoDB setup, but it is a teaching scaffold rather than a product: it has placeholder pages, a single `student` collection, no authorization middleware, hard-coded secrets, no validation, and no tests. FLEXI preserves the two-part `client` / `server` architecture and the approachable JavaScript stack, while replacing the weak parts with a documented, testable design.
 
 The realistic MVP is a complete collaboration loop:
 
@@ -499,7 +499,7 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | --- | --- |
 | Objective | Inspect the reference, define scope, architecture, security, testing, and Git process |
 | Dependencies | None |
-| Planned file changes | This document set; root `.gitignore`; two required folders |
+| Planned file changes | This document set; per-app `.gitignore` files; two required folders |
 | Deliverables | Six planning documents; reference audit; local Phase 0 commit |
 | Acceptance criteria | Documents exist, are internally consistent, and contain no secrets or application code |
 | Required tests | Document/link review; folder-structure check; secret scan; `git diff` review |
@@ -512,25 +512,29 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | --- | --- |
 | Objective | Turn the visual direction into tokens and reusable primitives before feature pages |
 | Dependencies | Phase 0 |
-| Planned file changes | `Frontend-client/src/styles/tokens.css`, `global.css`, `components.css`; `src/components/ui/*`; optional design preview route |
-| Deliverables | Color/type/spacing tokens, buttons, inputs, cards, badges, avatars, empty/error/loading states, responsive shell |
+| Implemented files | `client/src/styles/tokens.css`, `global.css`, `components.css`, `preview.css`; `client/src/components/ui.jsx`, `icons.jsx`; `client/src/App.jsx` preview |
+| Deliverables | Color/type/spacing tokens, buttons, inputs, cards, badges, avatars, dialog, toast, empty/error/loading states, responsive preview |
 | Acceptance criteria | Components render all states; contrast and focus are verified; mobile and desktop shells match the plan |
-| Required tests | Component render tests; keyboard focus check; contrast audit; visual review at 320/768/1440 |
+| Required tests | `npm run lint`; `npm run build`; browser QA at 320/360/390/768/1024/1280/1440; keyboard, contrast, and reduced-motion checks |
 | Risks and mitigation | Over-designing before features; timebox and limit to primitives used by Phase 5+ |
-| Definition of done | Design tokens and primitives are merged and documented enough to reuse without rework |
+| Definition of done | Design tokens and primitives are implemented, locally verified, and documented enough to reuse without rework |
+
+**Phase 1 status (2026-10-26):** Implemented in `client/` as a labeled design-preview page. The preview currently lives at `/`; feature routes, backend integration, and test-suite tooling remain future work. Verification evidence is recorded in `TEST_PLAN.md`.
 
 ### Phase 2 — Project scaffolding and environment
 
 | Item | Detail |
 | --- | --- |
-| Objective | Create runnable frontend and backend skeletons with safe configuration |
-| Dependencies | Phase 0 |
-| Planned file changes | `Frontend-client/package.json`, Vite config, `src/main.jsx`, `App.jsx`; `Backend-server/package.json`, `src/server.js`, `src/app.js`, config files, `.env.example`, README files |
-| Deliverables | Vite dev server, Express API, `/api/health`, dev proxy, lint/format/test scripts, environment validation |
+| Objective | Complete runnable frontend and backend skeletons with safe configuration |
+| Dependencies | Phase 0; Phase 1 frontend scaffold |
+| Planned file changes | Extend `client/package.json`, Vite config, `src/main.jsx`, `App.jsx`; create `server/package.json`, `src/server.js`, `src/app.js`, config files, `.env.example`, README files |
+| Deliverables | Validated Vite setup, Express API, `/api/health`, dev proxy, lint/format/test scripts, environment validation |
 | Acceptance criteria | Clean install starts both apps; health returns `200`; missing required env fails fast with a clear message |
 | Required tests | Frontend build; backend health smoke test; lint; env-schema unit test |
 | Risks and mitigation | Dependency drift; pin compatible major versions and commit lockfiles |
 | Definition of done | A new machine can install, configure from `.env.example`, and run both apps |
+
+**Adjusted after Phase 1:** the client scaffold, lockfile, Vite config, and preview already exist. Phase 2 validates and extends them rather than recreating them, and adds the missing backend skeleton, environment validation, proxy, and test tooling.
 
 ### Phase 3 — MongoDB and data models
 
@@ -538,7 +542,7 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | --- | --- |
 | Objective | Implement schemas, indexes, references, and a repeatable seed |
 | Dependencies | Phase 2; running MongoDB (local/Docker/Atlas) |
-| Planned file changes | `Backend-server/src/models/*`, `src/config/db.js`, `src/scripts/seed.js`, model tests |
+| Planned file changes | `server/src/models/*`, `src/config/db.js`, `src/scripts/seed.js`, model tests |
 | Deliverables | User, Project, Application, Task, Milestone, Notification, SavedProject, ContactMessage, Report models; indexes; seed data |
 | Acceptance criteria | Unique constraints fire; invalid enums/enums are rejected; indexes exist in Compass; seed is idempotent or safely resettable |
 | Required tests | Model validation tests; unique index tests; seed integration test; index inspection |
@@ -551,7 +555,7 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | --- | --- |
 | Objective | Implement register, login, logout, session hydration, and reusable guards |
 | Dependencies | Phases 2, 3 |
-| Planned file changes | `Backend-server/src/routes/auth.*`, `controllers/auth.*`, `middleware/auth.*`, `validators/auth.*`; `Frontend-client/src/context/AuthContext.jsx`, `pages/auth/*`, `components/ProtectedRoute.jsx`, API client |
+| Planned file changes | `server/src/routes/auth.*`, `controllers/auth.*`, `middleware/auth.*`, `validators/auth.*`; `client/src/context/AuthContext.jsx`, `pages/auth/*`, `components/ProtectedRoute.jsx`, API client |
 | Deliverables | Hashed passwords, JWT cookie, `GET /auth/me`, rate-limited auth, inactive-user handling, login/signup screens, protected routing |
 | Acceptance criteria | Valid signup/login works; duplicate/invalid credentials fail safely; cookie is `httpOnly`; role guards work server-side |
 | Required tests | Auth integration suite; cookie attributes; 401/403 matrix; rate-limit test; frontend route-guard tests |
@@ -564,7 +568,7 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | --- | --- |
 | Objective | Deliver the marketing surface and contact flow that every user sees first |
 | Dependencies | Phases 1, 2; contact persistence requires Phase 3; auth nav requires Phase 4 |
-| Planned file changes | `Frontend-client/src/pages/{Home,About,Contact,NotFound}.jsx`, layouts, Navbar/Footer, supporting styles; `Backend-server` contact route/controller |
+| Planned file changes | `client/src/pages/{Home,About,Contact,NotFound}.jsx`, layouts, Navbar/Footer, supporting styles; `server` contact route/controller |
 | Deliverables | Home, About, Contact, 404, responsive navigation, public footer, contact admin-ready storage |
 | Acceptance criteria | Mandatory public pages are complete, accessible, and responsive; contact submission persists and gives feedback |
 | Required tests | Route render tests; form validation; contact API integration; keyboard/mobile pass |
@@ -717,7 +721,7 @@ The order follows hard dependencies. Public static pages can begin early, but au
 
 ### Constraints
 
-- Exactly two top-level application folders: `Frontend-client/` and `Backend-server/`.
+- Exactly two top-level application folders: `client/` and `server/`.
 - Planning documents live inside one of those folders, not a third root folder.
 - No copied `node_modules`; install from committed manifests and lockfiles.
 - No real-time, upload, payment, or email-provider integration in MVP.
