@@ -302,6 +302,39 @@ describe('project creation and ownership', () => {
     expect(missingDeadline.body.error.fields).toHaveProperty('deadline');
   });
 
+  it('normalizes date-only deadlines and reports slots only while recruiting', async () => {
+    const app = makeApp();
+    const owner = await registerUser(app);
+    const project = await createProject(owner.agent, { deadline: '2099-12-31' });
+
+    expect(project.deadline).toBe('2099-12-31T23:59:59.999Z');
+    expect(project.openSlots).toBe(3);
+
+    const invalidCalendarDate = await owner.agent
+      .post('/api/projects')
+      .set(writeHeaders)
+      .send(projectPayload({ deadline: '2100-02-30' }));
+    expect(invalidCalendarDate.status).toBe(422);
+    expect(invalidCalendarDate.body.error.fields).toHaveProperty('deadline');
+
+    const inProgress = await owner.agent
+      .patch(`/api/projects/${project.id}`)
+      .set(writeHeaders)
+      .send({ status: 'in_progress' });
+    expect(inProgress.status).toBe(200);
+    expect(inProgress.body.data.project.openSlots).toBe(0);
+
+    const publicDetail = await request(app).get(`/api/projects/${project.id}`);
+    expect(publicDetail.body.data.project.openSlots).toBe(0);
+
+    const completed = await owner.agent
+      .patch(`/api/projects/${project.id}`)
+      .set(writeHeaders)
+      .send({ status: 'completed' });
+    expect(completed.status).toBe(200);
+    expect(completed.body.data.project.openSlots).toBe(0);
+  });
+
   it('publishes recruiting projects with a server timestamp and blocks admins', async () => {
     const app = makeApp();
     const owner = await registerUser(app);

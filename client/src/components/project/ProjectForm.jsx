@@ -121,8 +121,11 @@ function validate(values, mode, project) {
 
   if (values.deadline) {
     const deadline = new Date(`${values.deadline}T23:59:59.999Z`);
+    const normalizedDate = Number.isNaN(deadline.getTime())
+      ? null
+      : deadline.toISOString().slice(0, 10);
 
-    if (Number.isNaN(deadline.getTime())) {
+    if (Number.isNaN(deadline.getTime()) || normalizedDate !== values.deadline) {
       fields.deadline = 'Enter a valid date.';
     } else if (deadline.getTime() <= Date.now()) {
       fields.deadline = 'Choose a deadline in the future.';

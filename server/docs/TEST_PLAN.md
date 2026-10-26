@@ -84,10 +84,8 @@ npm run seed:test        # seed a safe test database
 
 ```bash
 npm run lint
-npm test                 # Vitest + React Testing Library
-npm run test:coverage
+npm test                 # Node test runner: formatting, availability, route selection
 npm run build
-npm run test:e2e         # Playwright, after both apps are running
 ```
 
 A root-level combined command is not required because the root must contain only the two application folders. CI can run each folder as a separate job.
@@ -269,7 +267,7 @@ Every test uses Supertest against the Express app with a real in-memory database
 
 ## 6. Frontend component and route tests
 
-Use Vitest + React Testing Library + jsdom; mock network with MSW.
+Phase 4 runs `client/test/*.test.js` with Node's built-in test runner for pure formatting, availability, and route-selection utilities. The component and route coverage below remains planned for when the client adds Vitest, React Testing Library, jsdom, and MSW.
 
 | Area | Cases |
 | --- | --- |
@@ -424,7 +422,7 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 - [x] Cookie attributes verified.
 - [x] Rate limit verified.
 
-**Evidence:** the full backend suite now passes 71 tests, including registration/login/logout/password-change, token tampering/expiry/scope, cookie attributes, CSRF rejection, authorization guards, and login rate limiting. Client lint/build pass. Browser verification covered signup, session persistence after refresh, logout, protected-route redirect with safe `returnTo`, invalid-login errors, and mobile layout. Cookie `Secure` is covered by production environment validation; the browser run used local HTTP cookies. Password show/hide remains a later UI checklist item.
+**Evidence:** the full backend suite now passes 72 tests, including registration/login/logout/password-change, token tampering/expiry/scope, cookie attributes, CSRF rejection, authorization guards, and login rate limiting. Client lint/build pass. Browser verification covered signup, session persistence after refresh, logout, protected-route redirect with safe `returnTo`, invalid-login errors, and mobile layout. Cookie `Secure` is covered by production environment validation; the browser run used local HTTP cookies. Password show/hide remains a later UI checklist item.
 
 ### Phase 5 — Public site
 
@@ -448,19 +446,20 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 
 ### Product Phase 4 — Public studio delivery
 
-- [x] Client lint and production build pass.
-- [x] Backend lint and full test suite pass: 6 files, 71 tests.
-- [x] Coverage run passes at 87.11% statements, 75.08% branches, 90.25% functions, and 87.14% lines.
+- [x] Client lint, 7 client unit tests, and production build pass.
+- [x] Backend lint and full test suite pass: 6 files, 72 tests.
+- [x] Coverage run passes at 87.4% statements, 75.44% branches, 90.25% functions, and 87.43% lines.
 - [x] `npm audit` reports 0 vulnerabilities in both client and server.
 - [x] Browser flow covers registration, login, project creation, discovery, public profile, profile update, manage list, edit, archive, contact, and 404.
-- [x] Final focused browser verification passes all 13 checks, including UTC deadlines, closed-team semantics, local timestamps, archived `409`, and dashboard navigation.
+- [x] Final focused browser verification passes all 33 affected-flow checks plus 11 regression checks, including timezone-aware dates, closed-team semantics, archived `409`, and dashboard navigation.
 - [x] Contact persistence is confirmed directly in `contactMessages`.
-- [x] Date-only deadlines render in UTC without shifting the calendar day.
-- [x] Non-recruiting projects no longer advertise open spots.
-- [x] Desktop and 390 px visual review completed for Home, Discovery, Detail, Profile, Settings, Dashboard, Create, and Manage pages.
-- [ ] Automated frontend component/E2E suites exist.
+- [x] Date-only deadlines remain on their selected UTC calendar day; local timestamps render in the viewer timezone; impossible calendar dates are rejected.
+- [x] Non-recruiting projects show `Not recruiting`, expose zero open slots from the API, and offer no application action while applications remain out of Phase 4 scope.
+- [x] Dashboard navigation selects exactly one item: Overview, Discover, My projects, or Profile, including create/edit routes under My projects.
+- [x] Desktop and 390 px visual review completed for affected dashboard, create, discovery, and project-detail flows.
+- [ ] Automated frontend component/E2E suites exist; deferred until Vitest/React Testing Library and a browser-test dependency are added. Current coverage is 7 Node utility tests plus headless browser verification scripts.
 
-**Evidence:** final command output and screenshots are recorded during the Phase 4 verification run; this product slice has no client test runner, so route behavior and visual states are verified with the headless browser harness instead of claimed component tests.
+**Evidence:** `npm run lint`, `npm test`, `npm run build`, `npm run test:coverage`, and both `npm audit` runs pass. The headless browser runs used an isolated QA server against ephemeral MongoDB: 33 affected-flow checks covered 1440 px and 390 px layouts plus `Pacific/Kiritimati` and `America/Adak` contexts, and 11 regression checks covered archived `409`, settings, management, contact, edit, and 404. Screenshots are stored under the Phase 4 QA artifact directory. Automated component/E2E suites remain deferred; the 7 client tests cover pure formatting, availability, and route-selection logic.
 
 ### Phase 7 — Team formation
 

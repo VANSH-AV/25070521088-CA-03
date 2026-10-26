@@ -19,7 +19,7 @@
 - Maximum JSON body size: 100 kb.
 - Only documented fields are accepted. Unknown fields are rejected with `422` rather than silently ignored.
 - IDs must be 24-character hex ObjectIds. Invalid IDs return `400 INVALID_ID`.
-- Dates use ISO 8601. Date-only deadline fields are sent as `YYYY-MM-DD` and normalized to end-of-day UTC.
+- Dates use ISO 8601. Date-only deadline fields are sent as `YYYY-MM-DD`, normalized to end-of-day UTC, and rejected if the calendar date is impossible (for example `2100-02-30`).
 - All list endpoints use `page` and `limit`; defaults and caps are listed per endpoint.
 - Sort values are whitelisted strings; never send raw MongoDB sort objects.
 - The browser client sends credentials with `credentials: "include"` and a custom `X-Requested-With: XMLHttpRequest` header on state-changing requests.
@@ -347,7 +347,7 @@ Return `429 RATE_LIMITED` with `Retry-After`. Rate-limit responses must not reve
 | Success | `200 { data: [project cards], meta }` |
 | Errors | `400 INVALID_PAGINATION`, `400 INVALID_SORT`, `422 VALIDATION_ERROR` |
 | Mongo | `projects.find({ isHidden: false, status: { $in: publicStatuses }, ...filters })`; text search or escaped regex; `countDocuments`; `skip/limit`; optional `savedProjects` lookup for the current user |
-| Notes | Only public statuses; never include draft/archived; project cards include owner summary, member count, open slots, skills, status, deadline. `slots` sort is implemented with an aggregation or computed field for recruiting projects; document the chosen approach in Phase 6 |
+| Notes | Only public statuses; never include draft/archived; project cards include owner summary, member count, skills, status, deadline, and `openSlots`. `openSlots` is available capacity only while `status === "recruiting"` and is `0` for in-progress/completed projects. `slots` sort uses an aggregation that ranks recruiting projects first. |
 
 ### `GET /api/projects/:id`
 
@@ -359,7 +359,7 @@ Return `429 RATE_LIMITED` with `Retry-After`. Rate-limit responses must not reve
 | Success | `200 { data: { project, viewer: { isOwner, canManage } } }` |
 | Errors | `400 INVALID_ID`, `404 NOT_FOUND` (hidden/private viewed by an unauthorized or anonymous user) |
 | Mongo | `projects.findById(id).populate(owner)`; increment `views` for public non-owner views; optional saved/application lookups |
-| Notes | Admin may view hidden/draft with moderation context; owner/member may view private; public progress can be shown for `in_progress`/`completed`; a private project returns 404 rather than revealing that it exists |
+| Notes | Admin may view hidden/draft with moderation context; owner/member may view private; public progress can be shown for `in_progress`/`completed`; `openSlots` is `0` outside `recruiting`; a private project returns 404 rather than revealing that it exists |
 
 ### `POST /api/projects`
 

@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/context.js';
+import { isMyProjectsRoute } from '../utils/navigation.js';
 import { Icon } from './icons.jsx';
 import { Avatar, Button, Logo } from './ui.jsx';
 
 export function DashboardLayout({ children }) {
   const { user, logout } = useAuth();
+  const { pathname } = useLocation();
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState('');
   const isStudent = user.role === 'student';
+  const myProjectsActive = isMyProjectsRoute(pathname);
 
   const handleLogout = async () => {
     setSigningOut(true);
@@ -36,7 +39,13 @@ export function DashboardLayout({ children }) {
           <NavLink to="/projects" end>
             Discover
           </NavLink>
-          <NavLink to="/dashboard/projects">My projects</NavLink>
+          <Link
+            to="/dashboard/projects"
+            className={myProjectsActive ? 'active' : undefined}
+            aria-current={myProjectsActive ? 'page' : undefined}
+          >
+            My projects
+          </Link>
           <NavLink to="/dashboard/profile">Profile</NavLink>
         </nav>
         <div className="dashboard-header__account">

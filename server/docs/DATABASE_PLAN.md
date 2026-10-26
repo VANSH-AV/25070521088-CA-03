@@ -44,7 +44,7 @@ Raw `mongodb` operations may still be used for aggregations and index diagnostic
 
 - The live Phase 4 APIs use `users`, `projects`, and `contactMessages`; the remaining models are defined and indexed but not yet exercised by feature routes.
 - Public user queries use an explicit projection (`PUBLIC_USER_SELECT`) that excludes `email`, `role`, `isActive`, `tokenVersion`, and `passwordHash`.
-- Date-only deadlines arrive as `YYYY-MM-DD`, are normalized to end-of-day UTC, and are rendered as UTC dates in the client so the calendar day does not shift.
+- Date-only deadlines arrive as `YYYY-MM-DD`, are rejected when the calendar date is impossible, normalized to end-of-day UTC, and rendered as UTC dates in the client so the calendar day does not shift.
 - Archived projects remain stored records and are read-only through the API. An untouched draft may be hard-deleted; shared or published projects are archived.
 - Discovery text search uses the weighted project text index; skill, tech, category, status, and visibility filters use their documented indexes. The `slots` sort is computed in an aggregation rather than stored.
 - No collection or required field was added for the Phase 4 slice. Contact messages persist with `status: "new"`; moderation fields remain unexposed.
@@ -212,7 +212,7 @@ There are no database-level foreign keys in MongoDB. Referential integrity is en
 **Derived values (never stored as authoritative fields)**
 
 - `totalMembers = 1 + members.length` (owner included).
-- `openSlots = max(0, teamSize - totalMembers)`.
+- `openSlots = max(0, teamSize - totalMembers)` while `status === "recruiting"`; public serialization reports `0` for every other status so stale capacity never advertises availability.
 - `progressPercent = round(doneTasks / totalTasks * 100)`; `0` when there are no tasks.
 - `isOverdue = deadline < now && status not in (completed, archived)`.
 - `isPublic = isHidden === false && status in (recruiting, in_progress, completed)`.

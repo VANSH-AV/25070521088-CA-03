@@ -248,6 +248,8 @@ client/
   index.html
   vite.config.js
   package.json
+  test/
+    format.test.js, navigation.test.js
   src/
     main.jsx                 # route table and global CSS imports
     api/
@@ -272,7 +274,7 @@ client/
       tokens.css, global.css, components.css
       auth.css, preview.css, pages.css
     utils/
-      format.js, usePageTitle.js
+      format.js, navigation.js, usePageTitle.js
 ```
 
 Later phases extend this tree with workspace/admin layouts, application and notification pages, and their API modules. `App.jsx` and the Phase 1 preview-only shell were removed once real routing replaced them; `preview.css` remains only for shared preview-derived primitives until it is fully absorbed.
@@ -283,6 +285,7 @@ Later phases extend this tree with workspace/admin layouts, application and noti
 - Literal paths are declared before parameterized paths (`/projects/new` and `/projects/:projectId/edit` before detail management).
 - Filters, sort, and page live in the discovery URL query string so links and back/forward work.
 - Public, auth, profile settings, and dashboard routes are explicit; admin/workspace trees come later.
+- Dashboard navigation selects exactly one current item. Discovery is exact-match only, while `/projects/new` and `/projects/:projectId/edit` keep My projects active alongside `/dashboard/projects`.
 - Public layouts restore scroll to the top on pathname changes; page titles update per screen.
 
 **Authentication state**
@@ -759,7 +762,7 @@ Primitives stay centralized in `ui.jsx`; feature components live under `componen
 | Private | `/dashboard`, `/dashboard/projects`, `/dashboard/profile`, `/projects/new`, `/projects/:id/edit` |
 | Error | unmatched routes render the designed 404 page |
 
-**Verification:** client lint/build pass; headless browser flows cover desktop and mobile public/private pages, date/availability display, profile updates, project create/edit/archive, contact, and 404. See `../../server/docs/TEST_PLAN.md` for evidence. Automated frontend component and E2E suites remain deferred because the client has no test runner yet.
+**Verification:** client lint/build and 7 Node unit tests pass. The final headless browser runs covered 33 affected-flow checks plus 11 regression checks across desktop and 390 px layouts, including UTC deadlines in `Pacific/Kiritimati` and `America/Adak`, closed-team availability, archived `409`, and one current dashboard item on overview, management, create, and edit routes. See `../../server/docs/TEST_PLAN.md` for evidence. Automated frontend component and E2E suites remain deferred because the client has no browser-test dependency.
 
 **Design non-goals for MVP**
 
@@ -790,11 +793,13 @@ Primitives stay centralized in `ui.jsx`; feature components live under `componen
 - [x] Login/Signup forms are labeled, validated, and usable on mobile.
 - [x] Discovery filters, sort, pagination, and empty/error states work; saving remains deferred.
 - [x] Project detail shows status, team, skills, and the correct action for guest/student/owner/admin.
+- [x] Deadline dates stay on their UTC calendar day while record timestamps render in local time.
+- [x] Non-recruiting projects show a closed availability state and no open-spot or application action.
 - [x] Public profile exposes no private data.
 
 ### Authenticated pages
 
-- [x] Topbar navigation is role-aware and keyboard accessible.
+- [x] Topbar navigation is role-aware, keyboard accessible, and selects one correct current item.
 - [x] Dashboard counts match the underlying lists.
 - [ ] Applications show capacity consequences and decision results clearly.
 - [ ] Workspace tabs are usable on mobile; task board has a non-drag alternative.

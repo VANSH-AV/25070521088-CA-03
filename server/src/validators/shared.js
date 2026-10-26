@@ -79,8 +79,15 @@ export function dateInputSchema({ allowEmpty = false } = {}) {
 
       const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
       const parsed = new Date(dateOnly ? `${value}T23:59:59.999Z` : value);
+      const normalizedDateOnly =
+        dateOnly && !Number.isNaN(parsed.getTime())
+          ? parsed.toISOString().slice(0, 10)
+          : null;
 
-      if (Number.isNaN(parsed.getTime())) {
+      if (
+        Number.isNaN(parsed.getTime()) ||
+        (dateOnly && normalizedDateOnly !== value)
+      ) {
         context.addIssue({
           code: 'custom',
           message: 'Enter a valid date.',

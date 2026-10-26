@@ -92,6 +92,7 @@ export function projectCard(project, people = new Map()) {
     .map((member) => resolvePerson(member, people))
     .filter(Boolean);
   const memberCount = 1 + members.length;
+  const availableSlots = Math.max(0, project.teamSize - memberCount);
 
   return {
     id: userId(project),
@@ -103,7 +104,7 @@ export function projectCard(project, people = new Map()) {
     techStack: project.techStack || [],
     teamSize: project.teamSize,
     memberCount,
-    openSlots: Math.max(0, project.teamSize - memberCount),
+    openSlots: project.status === 'recruiting' ? availableSlots : 0,
     deadline: project.deadline || null,
     owner,
     members,
