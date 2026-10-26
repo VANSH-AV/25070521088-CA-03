@@ -5,9 +5,9 @@
 | Base URL (planned) | `http://localhost:5000/api` in development; `/api` in production |
 | Protocol | HTTPS in production; JSON request/response |
 | Authentication | JWT in `httpOnly` cookie `flexi_token`; optional `Authorization: Bearer <token>` for API clients/tests |
-| Status | Planned contract; no route is implemented in Phase 0 |
+| Status | `GET /api/health` implemented; all auth and feature endpoints remain planned |
 
-> Every endpoint below is a **proposal**. Nothing has been built yet. The implementation must match this contract unless a documented change is approved and both this file and `DATABASE_PLAN.md` are updated.
+> Every endpoint below other than health is a **proposal**. The implementation must match this contract unless a documented change is approved and both this file and `DATABASE_PLAN.md` are updated.
 
 ---
 

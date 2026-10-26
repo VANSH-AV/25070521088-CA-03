@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Database | MongoDB |
-| ODM | Mongoose 8.x (planned) |
-| Database names | `flexi_dev`, `flexi_test`, `flexi_prod` (selected by `MONGODB_URI`) |
+| ODM | Mongoose 9.x |
+| Database names | `flexi_dev`, `flexi_test`, `flexi_prod` (selected by `MONGODB_DB_NAME`) |
 | Inspection tool | MongoDB Compass |
-| Status | Planned; no schemas or collections have been created yet |
+| Status | Schemas and indexes implemented; seed and service workflows pending |
 
-> This is a design document. No Mongoose model, index, or seed code exists in Phase 0.
+> Schemas and indexes now live in `server/src/models/`. Seed data, transactions, and feature services are implemented in later phases.
 
 ---
 

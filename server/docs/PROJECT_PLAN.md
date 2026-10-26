@@ -3,13 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Product | FLEXI — Student Project Collaboration Studio |
-| Phase | Phase 1 — UI/UX design system |
-| Status | Phase 1 implemented and locally verified; Phase 2 not started |
+| Phase | Phase 2 — Backend foundation and data layer |
+| Status | Phase 1 committed; Phase 2 backend/data-layer foundation implemented and locally verified; authentication and feature APIs not started |
 | Date | 2026-10-26 |
 | Repository state | New local repository; Phase 0 committed; no personal remote configured yet |
 | Related plans | `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md`, `TEST_PLAN.md`, `../../client/docs/UI_UX_PLAN.md` |
 
-> Feature and API behavior in this document remains **planned**. Phase 1 implements only the frontend design foundation and a labeled preview page; no backend, database, authentication, or feature workflow is connected.
+> Feature and API behavior in this document remains **planned**. Phase 1 implements the frontend design foundation and a labeled preview page. Phase 2 adds the backend shell, health/error handling, MongoDB connection, nine Mongoose models with indexes, and backend tests; authentication, seed data, and feature workflows are not connected yet.
 
 ---
 
@@ -534,7 +534,9 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | Risks and mitigation | Dependency drift; pin compatible major versions and commit lockfiles |
 | Definition of done | A new machine can install, configure from `.env.example`, and run both apps |
 
-**Adjusted after Phase 1:** the client scaffold, lockfile, Vite config, and preview already exist. Phase 2 validates and extends them rather than recreating them, and adds the missing backend skeleton, environment validation, proxy, and test tooling.
+**Adjusted after Phase 1:** the client scaffold, lockfile, Vite config, and preview already exist. Phase 2 validates and extends them rather than recreating them, and adds the missing backend skeleton, environment validation, data layer, and test tooling.
+
+**Phase 2 status (2026-10-26):** Implemented in `server/`: Express app/server lifecycle, validated environment, MongoDB connection, `/api/health`, JSON errors, 404 handling, CORS, Helmet, body limit, rate limiting, request IDs, graceful shutdown, all nine models and indexes, index-sync script, and 32 automated tests. The data-model portion of Phase 3 was completed early; seed data, transactions, auth, and feature APIs remain pending.
 
 ### Phase 3 — MongoDB and data models
 
@@ -735,7 +737,7 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | Risk | Impact | Likelihood | Mitigation |
 | --- | --- | --- | --- |
 | Scope exceeds college timeline | Incomplete submission | High | MVP gates, deferred list, phase acceptance criteria |
-| MongoDB not running locally (observed port 27017 closed, Docker daemon off) | Phase 3 blocked | Medium | Start Docker Desktop or use Atlas; document both |
+| MongoDB not running locally (observed port 27017 closed, Docker daemon off) | Seed/Compass/transaction verification blocked; model tests use in-memory MongoDB | Medium | Start Docker Desktop or use Atlas; document both |
 | Cross-site cookie/CORS failure in production | Login fails after deploy | Medium | Test deployed cookie attributes; prefer same-site proxy; explicit CORS allowlist |
 | Application capacity race | Overfilled teams / inconsistent data | Medium | Transaction plus conditional updates; concurrent test |
 | Authorization gaps | Data leak / IDOR | Medium | Central middleware, role matrix, negative tests |

@@ -4,7 +4,7 @@
 | --- | --- |
 | Scope | FLEXI web application, API, MongoDB, Git repository, deployment |
 | Security baseline | OWASP Top 10 awareness, least privilege, defense in depth |
-| Status | Planned; controls are implemented from Phase 2 onward and verified in Phase 11 |
+| Status | Phase 2 baseline controls implemented (env validation, Helmet, CORS allowlist, rate limiting, body limit, safe errors); auth and deployment controls remain planned |
 | Related plans | `PROJECT_PLAN.md`, `DATABASE_PLAN.md`, `API_PLAN.md`, `TEST_PLAN.md` |
 
 > This plan contains no real credentials. All examples use placeholders. Never commit a real `.env`, token, key, password, or connection string.

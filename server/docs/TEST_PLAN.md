@@ -4,7 +4,7 @@
 | --- | --- |
 | Purpose | Define how FLEXI is verified from Phase 0 through deployment |
 | Test stack (planned) | Vitest, Supertest, mongodb-memory-server, React Testing Library, MSW, Playwright, axe |
-| Status | Phase 1 UI verification complete via lint/build and headless browser QA; automated component/E2E suites still planned |
+| Status | Phase 1 UI and Phase 2 backend/data-layer verification complete; frontend component/E2E suites and later-phase workflows remain planned |
 | Related plans | `PROJECT_PLAN.md`, `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md` |
 
 > No test, build, or deployment claim is valid unless the result was observed. This plan defines the evidence required at each phase.
@@ -395,23 +395,27 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 
 **Evidence:** `npm run lint`, `npm run build`, headless browser QA output, screenshots, manual a11y notes. Automated component/E2E test tooling is deferred to Phase 2 scaffolding.
 
-### Phase 2 — Scaffolding
+### Phase 2 — Scaffolding and backend foundation
 
-- [ ] Clean install succeeds in both folders.
-- [ ] Frontend dev server starts; backend starts; `/api/health` returns `200`.
-- [ ] Missing env fails fast; lint/build pass.
-- [ ] No secrets in the repo.
+- [x] Clean installs and lockfiles exist in both folders.
+- [x] Frontend lint/build pass; backend lint passes.
+- [x] Backend starts without MongoDB and `/api/health` returns `503` instead of a false success.
+- [x] `/api/health` returns `200` against a connected in-memory MongoDB.
+- [x] Missing required env fails fast with a clear message.
+- [x] CORS, security headers, body limit, rate limiting, request IDs, error envelopes, and unknown-route handling are covered.
+- [x] No secrets are committed.
 
-**Evidence:** commands and outputs; health response.
+**Evidence:** `server` lint/test/coverage and client lint/build output; live no-DB server smoke test returned `503`; 32 tests passed (app shell, validation, env, errors, health, models, indexes).
 
 ### Phase 3 — Database
 
-- [ ] Models validate required fields/enums.
-- [ ] Unique indexes fire for email, application, saved project, report.
-- [ ] Seed creates demo scenarios; indexes visible in Compass.
+- [x] Models validate required fields/enums and field invariants.
+- [x] Unique indexes fire for email, application, saved project, report, and notification dedupe keys.
+- [ ] Seed creates demo scenarios.
 - [ ] Transactions work in the test replica set.
+- [ ] Indexes inspected in Compass against a local/Atlas database.
 
-**Evidence:** test output, Compass screenshots/index list, seed output.
+**Evidence:** in-memory MongoDB model/health suite (15 tests) and index assertions. Local MongoDB/Compass inspection and seed verification remain blocked until a database is available.
 
 ### Phase 4 — Auth
 
