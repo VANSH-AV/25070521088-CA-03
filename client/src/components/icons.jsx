@@ -27,6 +27,7 @@ const iconPaths = {
     </>
   ),
   check: <path d="m5 12 4 4L19 5.5" />,
+  circle: <circle cx="12" cy="12" r="8" />,
   checkCircle: (
     <>
       <circle cx="12" cy="12" r="9" />
@@ -71,6 +72,37 @@ const iconPaths = {
     <>
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="m4 7 8 6 8-6" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 20a7 7 0 0 1 14 0" />
+    </>
+  ),
+  edit: (
+    <>
+      <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z" />
+      <path d="m14.5 6.5 3 3" />
+    </>
+  ),
+  archive: (
+    <>
+      <rect x="3" y="4" width="18" height="5" rx="1" />
+      <path d="M5 9v10h14V9" />
+      <path d="M10 13h4" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3.5 9h17M3.5 15h17" />
+      <path d="M12 3c2.4 2.6 3.6 5.6 3.6 9s-1.2 6.4-3.6 9c-2.4-2.6-3.6-5.6-3.6-9S9.6 5.6 12 3Z" />
+    </>
+  ),
+  filter: (
+    <>
+      <path d="M4 6h16M7 12h10M10 18h4" />
     </>
   ),
   menu: (

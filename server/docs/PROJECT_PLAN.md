@@ -3,13 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Product | FLEXI — Student Project Collaboration Studio |
-| Phase | Phase 2 — Backend foundation and data layer |
-| Status | Phase 1 committed; Phase 2 backend/data-layer foundation implemented and locally verified; authentication and feature APIs not started |
+| Phase | Phase 4 — Public studio, profiles, discovery, and project management |
+| Status | Phases 0–4 implemented and locally verified; applications, workspaces, notifications, admin inbox, and seed data remain pending |
 | Date | 2026-10-26 |
-| Repository state | Local repository with Phases 0, 1, and 2 committed; no personal remote configured |
+| Repository state | Local repository with Phases 0–3 committed and the Phase 4 product slice implemented and verified locally; no personal remote configured |
 | Related plans | `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md`, `TEST_PLAN.md`, `../../client/docs/UI_UX_PLAN.md` |
 
-> Feature and API behavior in this document remains **planned**. Phase 1 implements the frontend design foundation and a labeled preview page. Phase 2 adds the backend shell, health/error handling, MongoDB connection, nine Mongoose models with indexes, and backend tests; authentication, seed data, and feature workflows are not connected yet.
+> **Implementation phase naming:** this build uses Phase 1 for the design foundation, Phase 2 for the backend/data layer, Phase 3 for authentication and security, and Phase 4 for the public studio, profiles, discovery, and project management. The roadmap below retains its original delivery numbering, so the Phase 5 public-site scope and Phase 6 profiles/discovery scope are now delivered together as the Phase 4 product slice. Applications, workspaces, notifications, administrative moderation, seed data, and deployment remain planned.
 
 ---
 
@@ -269,7 +269,7 @@ Priority uses MoSCoW: **M** = must for MVP, **S** = should, **C** = could, **W**
 | NFR-11 | Accessibility of states | Loading, empty, error, success, and disabled states are designed, not improvised |
 | NFR-12 | Scalability | Pagination on all lists; indexes for documented query paths; no unbounded collection scans for core screens |
 | NFR-13 | Data integrity | Unique constraints and transactions protect applications and capacity |
-| NFR-14 | Time handling | Store UTC; display in the viewer's local timezone; deadlines are dates with explicit interpretation |
+| NFR-14 | Time handling | Store UTC; date-only deadlines render in UTC to avoid day shifts, timestamps render in the viewer's local timezone |
 
 ---
 
@@ -429,25 +429,25 @@ Priority uses MoSCoW: **M** = must for MVP, **S** = should, **C** = could, **W**
 
 ### Public and accounts
 
-- [ ] Home, About, Contact, Sign Up, and Login are reachable and responsive.
-- [ ] The contact form validates, rate-limits, and stores a message visible to admins.
-- [ ] Signup rejects duplicate emails and weak passwords.
-- [ ] Login sets a server-verified session; refresh keeps the user signed in.
-- [ ] Logout clears the session and protected routes redirect to login.
-- [ ] A guest can browse published projects and public profiles but cannot use write actions.
+- [x] Home, About, Contact, Sign Up, and Login are reachable and responsive.
+- [x] The contact form validates, rate-limits, and persists a message; the admin inbox remains Phase 10.
+- [x] Signup rejects duplicate emails and weak passwords.
+- [x] Login sets a server-verified session; refresh keeps the user signed in.
+- [x] Logout clears the session and protected routes redirect to login.
+- [x] A guest can browse published projects and public profiles but cannot use write actions.
 
 ### Profiles and discovery
 
-- [ ] A student can edit profile fields and skill tags; invalid URLs are rejected.
-- [ ] Public profiles show skills and public projects but not email or password data.
-- [ ] Search, skill/category/status filters, sorting, and pagination work together.
-- [ ] Each project card shows title, owner, skills, team slots, status, and deadline.
-- [ ] Empty search results show a designed empty state with a reset action.
+- [x] A student can edit profile fields and skill tags; invalid URLs are rejected.
+- [x] Public profiles show skills and public projects but not email or password data.
+- [x] Search, skill/category/status filters, sorting, and pagination work together.
+- [x] Each project card shows title, owner, skills, team slots, status, and deadline.
+- [x] Empty search results show a designed empty state with a reset action.
 
 ### Projects and applications
 
-- [ ] A student can create a draft, publish it, edit it, and archive it.
-- [ ] Only the owner (or admin moderation action) can change a project.
+- [x] A student can create a draft, publish it, edit it, and archive it.
+- [x] Only the owner (or admin moderation action) can change a project.
 - [ ] A student cannot apply to their own project, twice, or to a closed/full project.
 - [ ] Owner sees pending applications with applicant profiles and messages.
 - [ ] Accepting an applicant adds exactly one member and notifies them.
@@ -581,6 +581,8 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | Risks and mitigation | Marketing polish consuming phase time; cap visual iteration and reuse the design system |
 | Definition of done | Public site is demo-ready and the contact message appears in the database |
 
+**Public-site status (product Phase 4, 2026-10-26):** Delivered early. Home, About, Contact, and 404 use live layouts and database-backed discovery links; navigation is auth-aware and responsive; contact submissions are validated, rate-limited, and persisted to `contactMessages`. The admin inbox is intentionally deferred to Phase 10.
+
 ### Phase 6 — Profiles and project discovery
 
 | Item | Detail |
@@ -593,6 +595,8 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | Required tests | Project CRUD integration; IDOR tests; search/filter/sort tests; public/private visibility tests; form tests |
 | Risks and mitigation | Search complexity and index limits; use one text index plus equality filters and document ranking |
 | Definition of done | A student can publish a project and another student can find it |
+
+**Profiles/discovery status (product Phase 4, 2026-10-26):** Delivered. Students can edit private profiles and view explicit public projections; project create/edit/archive, skill and tag normalization, discovery filters/sorts/pagination, owner-only management, draft/archived visibility rules, and public detail/dashboard flows are implemented. Applications, saved projects, and admin moderation remain future phases.
 
 ### Phase 7 — Team formation and applications
 

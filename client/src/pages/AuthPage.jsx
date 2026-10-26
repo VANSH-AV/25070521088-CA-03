@@ -148,7 +148,7 @@ export function AuthPage({ mode }) {
         </Link>
         <Link className="auth-page__back" to="/">
           <Icon name="arrowLeft" size={16} />
-          Back to preview
+          Back to studio
         </Link>
       </header>
 
@@ -166,7 +166,7 @@ export function AuthPage({ mode }) {
           <p className="auth-page__lede">
             {isRegister
               ? 'One student account, one clear place to find projects, share context, and build work worth showing.'
-              : 'Sign in to see your projects, applications, and the next small step. No passwords or tokens are stored in browser storage.'}
+              : 'Sign in to manage your profile, keep project briefs current, and pick up the next small step. No passwords or tokens are stored in browser storage.'}
           </p>
           <ul className="auth-page__points">
             <li>

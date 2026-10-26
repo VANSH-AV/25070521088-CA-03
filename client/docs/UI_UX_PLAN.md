@@ -4,10 +4,10 @@
 | --- | --- |
 | Product | FLEXI — Student Project Collaboration Studio |
 | Design direction | Editorial studio meets campus workshop |
-| Phase | Phase 1 — design system and preview implemented; Phase 2 backend/data layer complete; feature pages not started |
+| Phase | Phase 4 — public studio, profiles, discovery, and project management implemented |
 | Related plans | `../../server/docs/PROJECT_PLAN.md`, `API_PLAN.md`, `DATABASE_PLAN.md`, `SECURITY_PLAN.md` |
 
-> This document defines the visual system, page map, component inventory, states, and accessibility expectations for later phases. Phase 1 implements the tokens, primitives, states, and a labeled preview page. Phase 2 adds the backend foundation and MongoDB models in `server/` but does not connect the client to feature APIs; feature pages and live data remain future work.
+> This document defines the visual system, page map, component inventory, states, and accessibility expectations. Phase 4 now connects the Phase 1 design system to live APIs: public Home/About/Contact/Discovery/Detail/Profile pages, authentication, private dashboard/project management, and profile settings are implemented. Applications, workspaces, notifications, saved projects, showcase curation, and admin pages remain future work. The planned inventory below is retained as the target for those phases.
 
 ---
 
@@ -231,93 +231,59 @@ Avoid decorative scripts, all-caps body copy, and more than three weights in one
 ### 4.1 Route guards
 
 - `ProtectedRoute`: waits for `GET /auth/me`; redirects guests to `/login?returnTo=<path>`.
-- `GuestOnlyRoute`: redirects authenticated users to `/dashboard`.
-- `RoleRoute`: server still enforces roles; the UI renders a friendly 403 for mismatch.
-- `ProjectAccessRoute`: loads workspace access; non-members see 404/403 without private data.
+- `GuestOnlyRoute`: redirects authenticated users to a safe `returnTo` or `/dashboard`.
+- `StudentRoute`: requires an authenticated student and redirects admins to `/dashboard`; the server still rejects admin writes.
 - After login, honor a safe internal `returnTo` only; reject external URLs.
-- Route transitions scroll to top and update `document.title`; announce the new title for screen readers.
+- Public layouts scroll to the top on pathname changes; page titles update through `usePageTitle`.
+- Workspace/admin route guards remain a later-phase requirement.
 
-### 4.2 Frontend application architecture (planned)
+### 4.2 Frontend application architecture (implemented through Phase 4)
 
-Keep the architecture small enough to explain in a viva. Use React Router for routing, one auth context, a typed-by-convention API service layer, and page-local state. Do not introduce Redux, React Query, or a design framework unless a concrete problem justifies it.
+Keep the architecture small enough to explain in a viva. Use React Router for routing, one auth context, a small API service layer, and page-local state. Do not introduce Redux, React Query, or a design framework unless a concrete problem justifies it.
 
-**Planned full-app structure (Phase 1 creates only the foundation described in section 12):**
+**Current structure:**
 
 ```text
 client/
   index.html
   vite.config.js
   package.json
-  .env.example
   src/
-    main.jsx
-    App.jsx
-    router.jsx
-    styles/
-      tokens.css
-      global.css
-      components.css
-      preview.css
-      pages/
-    layouts/
-      PublicLayout.jsx
-      DashboardLayout.jsx
-      WorkspaceLayout.jsx
-      AdminLayout.jsx
-    pages/
-      public/        Home, About, Contact, Projects, ProjectDetail, StudentProfile, Showcase, NotFound
-      auth/          Login, Signup
-      dashboard/     Overview, MyProjects, ReceivedApplications, MyApplications, Saved, Notifications, Profile
-      projects/      ProjectCreate, ProjectEdit
-      workspace/     Overview, Tasks, Milestones, Team, Applications
-      admin/         Overview, Users, Projects, Messages, Reports
-      errors/        Forbidden, ServerError
+    main.jsx                 # route table and global CSS imports
+    api/
+      client.js              # fetch, envelope/error handling
+      auth.js, users.js, projects.js, contact.js
+    auth/
+      AuthContext.jsx, context.js, returnTo.js, RouteGuards.jsx
     components/
-      ui/            Button, Input, Badge, Avatar, Card, Modal, Toast, Skeleton, EmptyState...
-      layout/        Navbar, SidebarNav, Footer, Tabs, PageHeader, Pagination
-      project/       ProjectCard, ProjectGrid, ProjectForm, ApplicationCard, SaveButton
-      workspace/     TaskItem, TaskBoard, TaskForm, MilestoneTimeline, ProgressBar, TeamRoster
-      admin/         AdminTable, ReportQueue, MessageInbox, ModerationActions
-    context/
-      AuthContext.jsx
-      ToastContext.jsx
-    hooks/
-      useAuth.js
-      useApi.js
-      useDebounce.js
-      usePagination.js
-      useDocumentTitle.js
-    services/
-      api.js
-      auth.service.js
-      user.service.js
-      project.service.js
-      application.service.js
-      task.service.js
-      milestone.service.js
-      notification.service.js
-      saved.service.js
-      contact.service.js
-      report.service.js
-      admin.service.js
+      PublicLayout.jsx, DashboardLayout.jsx
+      TagInput.jsx, ui.jsx, icons.jsx
+      project/
+        ProjectCard.jsx, ProjectForm.jsx, ProjectManageList.jsx
+    pages/
+      HomePage.jsx, AboutPage.jsx, ContactPage.jsx
+      ProjectsPage.jsx, ProjectDetailPage.jsx
+      StudentProfilePage.jsx, AuthPage.jsx
+      DashboardPage.jsx, DashboardProjectsPage.jsx
+      ProfileSettingsPage.jsx
+      ProjectCreatePage.jsx, ProjectEditPage.jsx
+      NotFoundPage.jsx
+    styles/
+      tokens.css, global.css, components.css
+      auth.css, preview.css, pages.css
     utils/
-      validators.js
-      formatters.js
-      constants.js
-      permissions.js
-      url.js
-    tests/
-  tests/e2e/
+      format.js, usePageTitle.js
 ```
+
+Later phases extend this tree with workspace/admin layouts, application and notification pages, and their API modules. `App.jsx` and the Phase 1 preview-only shell were removed once real routing replaced them; `preview.css` remains only for shared preview-derived primitives until it is fully absorbed.
 
 **Routing**
 
-- `BrowserRouter` with nested layouts and `Outlet`; route-level `React.lazy` for admin/workspace/heavy pages.
-- Literal paths win over params (`/users/me` is handled by the API; frontend routes are explicit).
-- Filters and sort live in the URL query string on discovery so links/back-forward work.
-- A single `router.jsx` maps public, auth, dashboard, workspace, and admin trees.
-- Scroll restoration: top on new page, preserve on back where practical.
-- `document.title` and a route announcer update on navigation.
+- `BrowserRouter` owns the route table directly in `main.jsx` through Phase 4.
+- Literal paths are declared before parameterized paths (`/projects/new` and `/projects/:projectId/edit` before detail management).
+- Filters, sort, and page live in the discovery URL query string so links and back/forward work.
+- Public, auth, profile settings, and dashboard routes are explicit; admin/workspace trees come later.
+- Public layouts restore scroll to the top on pathname changes; page titles update per screen.
 
 **Authentication state**
 
@@ -748,9 +714,9 @@ Target **WCAG 2.1 AA** for core journeys.
 
 ---
 
-## 12. Design system implementation (Phase 1, implemented)
+## 12. Design system implementation (Phase 1 foundation, extended in Phase 4)
 
-**Implemented structure:**
+**Current shared structure:**
 
 ```text
 client/
@@ -759,26 +725,41 @@ client/
       tokens.css          # colors, type scale, spacing, radii, shadows, motion
       global.css          # reset, base elements, focus, skip link
       components.css      # shared primitive and state styles
-      preview.css         # preview page layout and responsive behavior
+      auth.css            # authentication screens
+      preview.css         # retained preview-derived layout utilities
+      pages.css           # public studio, dashboards, forms, detail pages
     components/
       ui.jsx              # Button, TextField, Badge, Avatar, Card, Dialog, Toast...
       icons.jsx           # inline icon set
-    App.jsx               # labeled design-preview composition
+      PublicLayout.jsx    # public nav, mobile menu, footer
+      DashboardLayout.jsx # authenticated studio navigation
+      TagInput.jsx        # reusable tag editor
+      project/            # ProjectCard, ProjectForm, ProjectManageList
 ```
 
-Phase 1 intentionally keeps primitives in one `ui.jsx` module so the foundation stays reviewable. Split it into feature folders only when real page boundaries exist.
+Primitives stay centralized in `ui.jsx`; feature components live under `components/project/` now that real page boundaries exist. Phase 1's `App.jsx` preview was removed in Phase 4 when `main.jsx` became the real route table.
 
-**Phase 1 deliverables — implemented**
+**Implemented design-system behavior**
 
 - CSS custom properties for the palette, type scale, spacing, radii, shadows, motion, and z-index.
 - Global reset, base typography, focus treatment, selection color, and skip link.
 - Primitive components with keyboard, hover, active, disabled, loading, error, empty, success, and responsive behavior.
-- A design preview page showing colors, type, actions, cards, badges, avatars, progress, fields, alerts, dialog, toast, and states.
+- Responsive public header with mobile menu, escape handling, and auth-aware actions.
+- Dashboard header/topbar navigation with explicit current-page treatment.
+- Live form patterns for projects, profiles, tags, filters, dialogs, and inline errors.
 - Fonts loaded with `display=swap` and fallbacks; Google Fonts with preconnect.
-- Headless browser contrast and layout checks at 320/360/390/768/1024/1280/1440.
-- No feature-specific page implementation beyond the gallery and shared preview shell.
+- Designs account for loading, empty, error, success, and unauthorized states on each implemented page.
 
-**Verification:** `npm run lint` and `npm run build` pass; browser QA reports no console errors, failed requests, or horizontal overflow. See `../../server/docs/TEST_PLAN.md` for evidence. Phase 2 added backend test tooling only; automated frontend component and E2E tests remain deferred to a later frontend phase.
+**Phase 4 page coverage**
+
+| Area | Routes |
+| --- | --- |
+| Public | `/`, `/about`, `/contact`, `/projects`, `/projects/:id`, `/students/:userId` |
+| Auth | `/login`, `/register` |
+| Private | `/dashboard`, `/dashboard/projects`, `/dashboard/profile`, `/projects/new`, `/projects/:id/edit` |
+| Error | unmatched routes render the designed 404 page |
+
+**Verification:** client lint/build pass; headless browser flows cover desktop and mobile public/private pages, date/availability display, profile updates, project create/edit/archive, contact, and 404. See `../../server/docs/TEST_PLAN.md` for evidence. Automated frontend component and E2E suites remain deferred because the client has no test runner yet.
 
 **Design non-goals for MVP**
 
@@ -804,21 +785,22 @@ Phase 1 intentionally keeps primitives in one `ui.jsx` module so the foundation 
 
 ### Public pages
 
-- [ ] Home communicates the product in one screen and has working discovery/signup CTAs.
-- [ ] About and Contact are complete and responsive.
-- [ ] Login/Signup forms are labeled, validated, and usable on mobile.
-- [ ] Discovery filters, sort, pagination, save, and empty/error states work.
-- [ ] Project detail shows status, team, skills, and the correct action for guest/student/owner/member.
-- [ ] Public profile exposes no private data.
+- [x] Home communicates the product in one screen and has working discovery/signup CTAs.
+- [x] About and Contact are complete and responsive.
+- [x] Login/Signup forms are labeled, validated, and usable on mobile.
+- [x] Discovery filters, sort, pagination, and empty/error states work; saving remains deferred.
+- [x] Project detail shows status, team, skills, and the correct action for guest/student/owner/admin.
+- [x] Public profile exposes no private data.
 
 ### Authenticated pages
 
-- [ ] Sidebar/topbar navigation is role-aware and keyboard accessible.
-- [ ] Dashboard counts match the underlying lists.
+- [x] Topbar navigation is role-aware and keyboard accessible.
+- [x] Dashboard counts match the underlying lists.
 - [ ] Applications show capacity consequences and decision results clearly.
 - [ ] Workspace tabs are usable on mobile; task board has a non-drag alternative.
 - [ ] Milestones and progress are visually consistent with task data.
 - [ ] Notifications have unread, read, and empty states.
+- [x] Project create/edit/archive flows, profile settings, and read-only archived states are implemented.
 
 ### Admin pages
 

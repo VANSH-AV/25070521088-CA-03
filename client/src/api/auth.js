@@ -1,12 +1,16 @@
 import { apiRequest } from './client.js';
 
+function normalizeUser(user) {
+  return user ? { ...user, id: user.id || user._id } : null;
+}
+
 export async function registerAccount({ name, email, password }) {
   const data = await apiRequest('/auth/register', {
     method: 'POST',
     body: { name, email, password },
   });
 
-  return data.user;
+  return normalizeUser(data.user);
 }
 
 export async function loginAccount({ email, password }) {
@@ -15,7 +19,7 @@ export async function loginAccount({ email, password }) {
     body: { email, password },
   });
 
-  return data.user;
+  return normalizeUser(data.user);
 }
 
 export async function logoutAccount() {
@@ -24,7 +28,7 @@ export async function logoutAccount() {
 
 export async function getCurrentUser({ signal } = {}) {
   const data = await apiRequest('/auth/me', { signal });
-  return data.user;
+  return normalizeUser(data.user);
 }
 
 export async function changeAccountPassword({ currentPassword, newPassword }) {
@@ -33,5 +37,5 @@ export async function changeAccountPassword({ currentPassword, newPassword }) {
     body: { currentPassword, newPassword },
   });
 
-  return data.user;
+  return normalizeUser(data.user);
 }

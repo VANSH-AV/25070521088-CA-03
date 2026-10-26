@@ -9,7 +9,10 @@ import { csrfProtection } from './middleware/csrf.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
 import { requestId } from './middleware/requestId.js';
 import { createAuthRouter } from './routes/auth.js';
+import { createContactRouter } from './routes/contact.js';
 import { createHealthRouter } from './routes/health.js';
+import { createProjectRouter } from './routes/projects.js';
+import { createUserRouter } from './routes/users.js';
 
 const DEFAULT_WINDOW_MS = 15 * 60 * 1000;
 const DEFAULT_LIMIT = 300;
@@ -26,6 +29,7 @@ export function createApp({
   databaseHealth,
   rateLimitOptions = {},
   authRateLimits = {},
+  contactRateLimits = {},
 } = {}) {
   const app = express();
 
@@ -62,6 +66,9 @@ export function createApp({
 
   app.use('/api', createHealthRouter({ databaseHealth }));
   app.use('/api/auth', createAuthRouter({ rateLimits: authRateLimits }));
+  app.use('/api/users', createUserRouter());
+  app.use('/api/projects', createProjectRouter());
+  app.use('/api/contact', createContactRouter({ rateLimits: contactRateLimits }));
 
   app.use(notFound);
   app.use(errorHandler);

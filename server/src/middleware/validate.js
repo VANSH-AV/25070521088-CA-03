@@ -14,6 +14,13 @@ export function validateBody(schema) {
       const fields = {};
 
       for (const issue of result.error.issues) {
+        if (issue.code === 'unrecognized_keys' && issue.keys?.length) {
+          for (const key of issue.keys) {
+            fields[key] = issue.message;
+          }
+          continue;
+        }
+
         const path = issue.path.join('.') || '_';
         fields[path] = issue.message;
       }

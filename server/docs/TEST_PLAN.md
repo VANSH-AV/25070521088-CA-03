@@ -4,7 +4,7 @@
 | --- | --- |
 | Purpose | Define how FLEXI is verified from Phase 0 through deployment |
 | Test stack (planned) | Vitest, Supertest, mongodb-memory-server, React Testing Library, MSW, Playwright, axe |
-| Status | Phase 1 UI and Phase 2 backend/data-layer verification complete; frontend component/E2E suites and later-phase workflows remain planned |
+| Status | Phases 1–4 implemented and locally verified; automated frontend suites and later application/workspace/admin workflows remain planned |
 | Related plans | `PROJECT_PLAN.md`, `DATABASE_PLAN.md`, `API_PLAN.md`, `SECURITY_PLAN.md` |
 
 > No test, build, or deployment claim is valid unless the result was observed. This plan defines the evidence required at each phase.
@@ -424,25 +424,43 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 - [x] Cookie attributes verified.
 - [x] Rate limit verified.
 
-**Evidence:** 53 backend tests pass, including registration/login/logout/password-change, token tampering/expiry/scope, cookie attributes, CSRF rejection, authorization guards, and login rate limiting. Client lint/build pass. Browser verification covered signup, session persistence after refresh, logout, protected-route redirect with safe `returnTo`, invalid-login errors, and mobile layout. Cookie `Secure` is covered by production environment validation; the browser run used local HTTP cookies. Password show/hide remains a later UI checklist item.
+**Evidence:** the full backend suite now passes 71 tests, including registration/login/logout/password-change, token tampering/expiry/scope, cookie attributes, CSRF rejection, authorization guards, and login rate limiting. Client lint/build pass. Browser verification covered signup, session persistence after refresh, logout, protected-route redirect with safe `returnTo`, invalid-login errors, and mobile layout. Cookie `Secure` is covered by production environment validation; the browser run used local HTTP cookies. Password show/hide remains a later UI checklist item.
 
 ### Phase 5 — Public site
 
-- [ ] Mandatory pages render and are responsive.
-- [ ] Contact stores a message; admin can read it later.
-- [ ] Keyboard and axe checks pass.
-- [ ] 404 works.
+- [x] Mandatory pages render and are responsive.
+- [x] Contact validation, rate limiting, generic feedback, and persistence are implemented.
+- [ ] Admin can read the contact inbox.
+- [ ] Full keyboard and axe checks pass.
+- [x] 404 works.
 
-**Evidence:** route tests, API test, manual checklist.
+**Evidence:** contact integration tests cover persistence, validation, honeypot discard, rate limiting, and absence of a public inbox; browser QA covered Home, About, Contact, 404, desktop/mobile layouts, and the success state. The admin inbox remains Phase 10, and a dedicated axe pass remains part of hardening.
 
 ### Phase 6 — Profiles and discovery
 
-- [ ] USR and PRJ tests pass.
-- [ ] Search/filter/sort/pagination combined correctly.
-- [ ] Owner-only edit enforced with IDOR tests.
-- [ ] Draft/hidden visibility enforced.
+- [x] USR and PRJ integration tests pass.
+- [x] Search/filter/sort/pagination combine correctly.
+- [x] Owner-only edit is enforced with cross-user and admin tests.
+- [x] Draft, archived, and hidden visibility is enforced.
+- [x] Profile projections exclude private fields.
 
-**Evidence:** test report; explain plans for discovery.
+**Evidence:** the Phase 4 suite covers profile update/validation and public projection, project create/edit/archive, non-owner and admin rejection, archived read-only behavior, discovery exclusions, combined filters/sorts/pagination, detail views, and invalid IDs/sorts. Browser QA covered create, discovery, profile edit/public refresh, project edit/status/archive, and responsive dashboard/detail pages. Seed data is not required for these tests and remains pending.
+
+### Product Phase 4 — Public studio delivery
+
+- [x] Client lint and production build pass.
+- [x] Backend lint and full test suite pass: 6 files, 71 tests.
+- [x] Coverage run passes at 87.11% statements, 75.08% branches, 90.25% functions, and 87.14% lines.
+- [x] `npm audit` reports 0 vulnerabilities in both client and server.
+- [x] Browser flow covers registration, login, project creation, discovery, public profile, profile update, manage list, edit, archive, contact, and 404.
+- [x] Final focused browser verification passes all 13 checks, including UTC deadlines, closed-team semantics, local timestamps, archived `409`, and dashboard navigation.
+- [x] Contact persistence is confirmed directly in `contactMessages`.
+- [x] Date-only deadlines render in UTC without shifting the calendar day.
+- [x] Non-recruiting projects no longer advertise open spots.
+- [x] Desktop and 390 px visual review completed for Home, Discovery, Detail, Profile, Settings, Dashboard, Create, and Manage pages.
+- [ ] Automated frontend component/E2E suites exist.
+
+**Evidence:** final command output and screenshots are recorded during the Phase 4 verification run; this product slice has no client test runner, so route behavior and visual states are verified with the headless browser harness instead of claimed component tests.
 
 ### Phase 7 — Team formation
 

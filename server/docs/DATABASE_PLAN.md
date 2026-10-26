@@ -6,9 +6,9 @@
 | ODM | Mongoose 9.x |
 | Database names | `flexi_dev`, `flexi_test`, `flexi_prod` (selected by `MONGODB_DB_NAME`) |
 | Inspection tool | MongoDB Compass |
-| Status | Schemas and indexes implemented; seed and service workflows pending |
+| Status | Schemas and indexes implemented; Phase 4 profile/project/contact services live; seed, transactions, and later feature workflows pending |
 
-> Schemas and indexes now live in `server/src/models/`. Seed data, transactions, and feature services are implemented in later phases.
+> Schemas and indexes live in `server/src/models/`. Phase 4 exercises `users`, `projects`, and `contactMessages`; applications, saved projects, tasks, milestones, notifications, reports, and audit logs remain reserved for later phases.
 
 ---
 
@@ -39,6 +39,15 @@ Raw `mongodb` operations may still be used for aggregations and index diagnostic
 - No plaintext passwords, JWT secrets, or connection strings in code or documentation examples.
 - No unbounded arrays: team membership is capped by `teamSize` (max 12), skills/tags are capped by validation.
 - No client-supplied owner, creator, role, timestamps, or moderation flags.
+
+### 1.3 Phase 4 implementation notes
+
+- The live Phase 4 APIs use `users`, `projects`, and `contactMessages`; the remaining models are defined and indexed but not yet exercised by feature routes.
+- Public user queries use an explicit projection (`PUBLIC_USER_SELECT`) that excludes `email`, `role`, `isActive`, `tokenVersion`, and `passwordHash`.
+- Date-only deadlines arrive as `YYYY-MM-DD`, are normalized to end-of-day UTC, and are rendered as UTC dates in the client so the calendar day does not shift.
+- Archived projects remain stored records and are read-only through the API. An untouched draft may be hard-deleted; shared or published projects are archived.
+- Discovery text search uses the weighted project text index; skill, tech, category, status, and visibility filters use their documented indexes. The `slots` sort is computed in an aggregation rather than stored.
+- No collection or required field was added for the Phase 4 slice. Contact messages persist with `status: "new"`; moderation fields remain unexposed.
 
 ---
 

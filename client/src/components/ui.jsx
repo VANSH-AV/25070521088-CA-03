@@ -167,7 +167,7 @@ export function SkillTag({ children, className = '' }) {
   return <span className={['skill-tag', className].filter(Boolean).join(' ')}>{children}</span>;
 }
 
-export function Avatar({ name, size = 36, decorative = false, className = '' }) {
+export function Avatar({ name, src, size = 36, decorative = false, className = '' }) {
   return (
     <span
       className={['avatar', `avatar--${avatarTone(name)}`, className]
@@ -178,23 +178,34 @@ export function Avatar({ name, size = 36, decorative = false, className = '' }) 
       aria-label={decorative ? undefined : name}
       aria-hidden={decorative ? 'true' : undefined}
     >
-      <span aria-hidden="true">{initials(name)}</span>
+      {src ? (
+        <img className="avatar__image" src={src} alt="" loading="lazy" />
+      ) : (
+        <span aria-hidden="true">{initials(name)}</span>
+      )}
     </span>
   );
 }
 
-export function AvatarStack({ names = [], max = 3, size = 30, label }) {
-  const visible = names.slice(0, max);
-  const remaining = names.length - visible.length;
+export function AvatarStack({ names = [], people, max = 3, size = 30, label }) {
+  const entries = people || names.map((name) => ({ name }));
+  const visible = entries.slice(0, max);
+  const remaining = entries.length - visible.length;
 
   return (
     <span
       className="avatar-stack"
       role="group"
-      aria-label={label || `Team: ${names.join(', ')}`}
+      aria-label={label || `Team: ${entries.map((person) => person.name).join(', ')}`}
     >
-      {visible.map((name) => (
-        <Avatar key={name} name={name} size={size} decorative />
+      {visible.map((person) => (
+        <Avatar
+          key={person.id || person.name}
+          name={person.name}
+          src={person.avatarUrl}
+          size={size}
+          decorative
+        />
       ))}
       {remaining > 0 && (
         <span
@@ -239,76 +250,6 @@ export function ProgressBar({
   );
 }
 
-export function ProjectCard({ project, saved = false, onToggleSave, className = '' }) {
-  return (
-    <article
-      className={['project-card', className].filter(Boolean).join(' ')}
-      aria-labelledby={`project-${project.id}-title`}
-    >
-      <div className={`project-card__cover project-card__cover--${project.coverTone}`}>
-        <span className="project-card__code">SAMPLE / {project.id.toUpperCase()}</span>
-        <span className="project-card__mark" aria-hidden="true">
-          {project.mark}
-        </span>
-        <span className="project-card__cover-note">{project.category}</span>
-      </div>
-
-      <div className="project-card__body">
-        <div className="project-card__top">
-          <StatusBadge status={project.status} />
-          <IconButton
-            label={saved ? `Remove ${project.title} from saved preview` : `Save ${project.title} to preview`}
-            icon="bookmark"
-            size="sm"
-            pressed={saved}
-            onClick={() => onToggleSave?.(project)}
-          />
-        </div>
-
-        <div>
-          <p className="project-card__meta">
-            <span>{project.owner}</span>
-            <span aria-hidden="true">/</span>
-            <span>{project.college}</span>
-          </p>
-          <h3 className="project-card__title" id={`project-${project.id}-title`}>
-            {project.title}
-          </h3>
-          <p className="project-card__summary">{project.summary}</p>
-        </div>
-
-        <div className="project-card__skills">
-          {project.skills.map((skill) => (
-            <SkillTag key={skill}>{skill}</SkillTag>
-          ))}
-        </div>
-
-        <div className="project-card__team">
-          <AvatarStack names={project.team} max={3} size={28} />
-          <span>{project.slots}</span>
-        </div>
-
-        <ProgressBar
-          value={project.progress}
-          label={project.progressLabel}
-          tone={project.status === 'completed' ? 'mint' : 'cobalt'}
-        />
-
-        <div className="project-card__footer">
-          <span>
-            <Icon name="calendar" size={15} />
-            {project.deadline}
-          </span>
-          <span>
-            <Icon name="users" size={15} />
-            {project.teamSize} person team
-          </span>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export function TextField({
   id,
   label,
@@ -337,6 +278,95 @@ export function TextField({
         aria-describedby={describedBy}
         {...inputProps}
       />
+      {hint && (
+        <p className="field__hint" id={hintId}>
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p className="field__error" id={errorId} role="alert">
+          <Icon name="alert" size={14} />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function TextAreaField({
+  id,
+  label,
+  hint,
+  error,
+  optional = false,
+  className = '',
+  ...textareaProps
+}) {
+  const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
+
+  return (
+    <div className={['field', error && 'field--error', className].filter(Boolean).join(' ')}>
+      <div className="field__label-row">
+        <label htmlFor={id}>{label}</label>
+        {optional && <span className="field__optional">Optional</span>}
+      </div>
+      <textarea
+        id={id}
+        className="field__input field__textarea"
+        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={describedBy}
+        {...textareaProps}
+      />
+      {hint && (
+        <p className="field__hint" id={hintId}>
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p className="field__error" id={errorId} role="alert">
+          <Icon name="alert" size={14} />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function SelectField({
+  id,
+  label,
+  hint,
+  error,
+  options = [],
+  optional = false,
+  className = '',
+  ...selectProps
+}) {
+  const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
+
+  return (
+    <div className={['field', error && 'field--error', className].filter(Boolean).join(' ')}>
+      <div className="field__label-row">
+        <label htmlFor={id}>{label}</label>
+        {optional && <span className="field__optional">Optional</span>}
+      </div>
+      <select
+        id={id}
+        className="field__input field__select"
+        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={describedBy}
+        {...selectProps}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
       {hint && (
         <p className="field__hint" id={hintId}>
           {hint}
@@ -394,7 +424,7 @@ export function StatCard({ label, value, note, tone = 'cobalt' }) {
   );
 }
 
-export function Dialog({ open, title, description, children, footer, onClose }) {
+export function Dialog({ open, title, description, eyebrow = 'Confirm action', children, footer, onClose }) {
   const dialogRef = useRef(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -458,7 +488,7 @@ export function Dialog({ open, title, description, children, footer, onClose }) 
       <div className="dialog__panel">
         <div className="dialog__head">
           <div>
-            <p className="dialog__eyebrow">Sample overlay</p>
+            <p className="dialog__eyebrow">{eyebrow}</p>
             <h2 id={titleId}>{title}</h2>
             {description && <p id={descriptionId}>{description}</p>}
           </div>

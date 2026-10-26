@@ -30,7 +30,7 @@ async function readPayload(response) {
   }
 }
 
-export async function apiRequest(path, { method = 'GET', body, signal } = {}) {
+async function requestPayload(path, { method = 'GET', body, signal } = {}) {
   const headers = {
     Accept: 'application/json',
   };
@@ -74,5 +74,19 @@ export async function apiRequest(path, { method = 'GET', body, signal } = {}) {
     });
   }
 
+  return payload;
+}
+
+export async function apiRequest(path, options) {
+  const payload = await requestPayload(path, options);
   return payload?.data ?? null;
+}
+
+export async function apiRequestPage(path, options) {
+  const payload = await requestPayload(path, options);
+
+  return {
+    data: payload?.data ?? [],
+    meta: payload?.meta ?? null,
+  };
 }

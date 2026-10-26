@@ -43,3 +43,25 @@ export function GuestOnlyRoute({ children }) {
 
   return children;
 }
+
+export function StudentRoute({ children }) {
+  const { status, user } = useAuth();
+  const location = useLocation();
+
+  if (status === 'loading') {
+    return <SessionLoading />;
+  }
+
+  if (status !== 'authenticated') {
+    const returnTo = `${location.pathname}${location.search}${location.hash}`;
+    const query = new URLSearchParams({ returnTo }).toString();
+
+    return <Navigate to={`/login?${query}`} replace />;
+  }
+
+  if (user.role !== 'student') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}

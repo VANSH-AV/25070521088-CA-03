@@ -5,9 +5,9 @@
 | Base URL (planned) | `http://localhost:5000/api` in development; `/api` in production |
 | Protocol | HTTPS in production; JSON request/response |
 | Authentication | JWT in `httpOnly` cookie `flexi_token`; optional `Authorization: Bearer <token>` for API clients/tests |
-| Status | `GET /api/health` implemented; all auth and feature endpoints remain planned |
+| Status | Phase 4 slice implemented: health, authentication, profiles, projects, and public contact; later endpoint groups remain planned |
 
-> Every endpoint below other than health is a **proposal**. The implementation must match this contract unless a documented change is approved and both this file and `DATABASE_PLAN.md` are updated.
+> The sections below remain the canonical API target. The implementation-status table in §1.9 marks the live Phase 4 routes and their deviations. Every future endpoint must match this contract unless a documented change is approved and both this file and `DATABASE_PLAN.md` are updated.
 
 ---
 
@@ -162,6 +162,31 @@ Return `429 RATE_LIMITED` with `Retry-After`. Rate-limit responses must not reve
 - Development uses a Vite proxy from the frontend dev server to `/api`, keeping the browser same-origin.
 - Production CORS allows only `CLIENT_ORIGIN` with credentials. Never use `origin: "*"` with credentials.
 - Bearer-token requests are not CSRF-susceptible, but still require authorization checks.
+
+### 1.9 Phase 4 implementation status
+
+**Live routes (16)**
+
+| Group | Routes |
+| --- | --- |
+| System | `GET /health` |
+| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`, `PATCH /auth/password` |
+| Users | `GET /users/me`, `PATCH /users/me`, `GET /users/me/projects`, `GET /users/:id` |
+| Projects | `GET /projects`, `POST /projects`, `GET /projects/:id`, `PATCH /projects/:id`, `DELETE /projects/:id` |
+| Contact | `POST /contact` |
+
+**All other endpoint sections remain planned.** In particular, the public user directory, applications, saved projects, workspaces, tasks, milestones, notifications, dashboards, reports, and admin inboxes are not registered yet.
+
+**Implemented deviations and clarifications**
+
+- `GET /projects/:id` returns `viewer: { isOwner, canManage }`; saved/application state is deferred until those features exist.
+- Public discovery supports `q`, `skill`, `tech`, `category`, `status`, `sort`, `page`, and `limit`. `q` uses the project text index; `slots` is an aggregation sort that ranks recruiting projects before closed projects. Saved-project personalization is not implemented.
+- Only active students have public profiles. Profile responses use an explicit public projection and omit email, role, activation, and auth fields.
+- `GET /users/me/projects` supports `role=owned|member|all`, `status`, `page`, and `limit`; it does not implement a separate sort parameter.
+- Project creation accepts only `draft` or `recruiting`; updates use the documented status transition allowlist and require a future deadline for any public status.
+- Archived projects are read-only: further `PATCH` requests return `409 CONFLICT`. `DELETE` on an already archived project is idempotent and returns `archived: true`.
+- Admins may read private project detail for moderation but are rejected by the student-only create, edit, and archive routes.
+- `POST /contact` persists only when the honeypot is empty and returns the same generic success shape either way. The admin contact inbox is planned for Phase 10.
 
 ---
 
@@ -331,7 +356,7 @@ Return `429 RATE_LIMITED` with `Retry-After`. Rate-limit responses must not reve
 | Purpose | Project detail page |
 | Auth | Public for public projects; Auth for private visibility |
 | Request | Path `id` |
-| Success | `200 { data: { project, viewer: { saved, applicationStatus } } }` |
+| Success | `200 { data: { project, viewer: { isOwner, canManage } } }` |
 | Errors | `400 INVALID_ID`, `404 NOT_FOUND` (hidden/private viewed by an unauthorized or anonymous user) |
 | Mongo | `projects.findById(id).populate(owner)`; increment `views` for public non-owner views; optional saved/application lookups |
 | Notes | Admin may view hidden/draft with moderation context; owner/member may view private; public progress can be shown for `in_progress`/`completed`; a private project returns 404 rather than revealing that it exists |
@@ -358,9 +383,9 @@ Return `429 RATE_LIMITED` with `Retry-After`. Rate-limit responses must not reve
 | Request | Any writable project field, including `status`; no `owner`, `members`, `views`, `isHidden`, `publishedAt`, `completedAt` |
 | Validation | State machine from `DATABASE_PLAN.md`; teamSize cannot fall below `1 + members.length`; required fields must remain valid |
 | Success | `200 { success: true, data: { project } }` |
-| Errors | `403 FORBIDDEN`, `404 NOT_FOUND`, `409 TEAM_SIZE_BELOW_CURRENT`, `409 INVALID_STATUS_TRANSITION`, `422 VALIDATION_ERROR` |
-| Mongo | Load project, authorize, validate transition, `findOneAndUpdate` with whitelisted `$set`; set `publishedAt`/`completedAt` when needed |
-| Notes | Setting `completed` sends member notifications; setting `recruiting` from a non-draft requires a valid transition only |
+| Errors | `403 FORBIDDEN`, `404 NOT_FOUND`, `409 CONFLICT` (archived/read-only), `409 TEAM_SIZE_BELOW_CURRENT`, `409 INVALID_STATUS_TRANSITION`, `422 VALIDATION_ERROR` |
+| Mongo | Load project, authorize, validate transition, assign whitelisted fields, save; the model sets `publishedAt`/`completedAt` when needed |
+| Notes | Archived projects reject all further edits. Setting `completed` will send member notifications once that feature exists; setting `recruiting` from a non-draft requires a valid transition only |
 
 ### `DELETE /api/projects/:id`
 
@@ -920,7 +945,8 @@ If the deployment cannot support a persistent scheduler, this notification type 
 | Reports | 5 | create, mine, admin list/detail/update |
 | Dashboards | 2 | student, owner |
 | Admin | 7+ | stats, users list/detail/update, projects list/detail/moderate, optional audit logs |
-| **Total** | **53** | Planned only |
+| **Total planned** | **53** | Full MVP proposal |
+| **Implemented in Phase 4** | **16** | health; auth; private/public profiles; project CRUD/discovery/archive; public contact |
 
 ---
 
