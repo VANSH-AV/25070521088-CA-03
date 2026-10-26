@@ -20,6 +20,7 @@ function loadEnv(overrides = {}) {
     CLIENT_ORIGIN: 'http://localhost:5173',
     MONGODB_URI: 'mongodb://127.0.0.1:27017',
     MONGODB_DB_NAME: 'flexi_test',
+    JWT_SECRET: 'test-only-secret-that-is-at-least-32-characters-long',
     ...overrides,
   };
 
@@ -53,6 +54,33 @@ describe('environment validation', () => {
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('Invalid environment configuration');
     expect(result.stderr).toContain('MONGODB_URI');
+  });
+
+  it('fails fast when the JWT secret is missing or too short', () => {
+    const missing = loadEnv({ JWT_SECRET: undefined });
+
+    expect(missing.status).toBe(1);
+    expect(missing.stderr).toContain('JWT_SECRET');
+
+    const short = loadEnv({ JWT_SECRET: 'too-short' });
+
+    expect(short.status).toBe(1);
+    expect(short.stderr).toContain('JWT_SECRET must contain at least 32 characters');
+  });
+
+  it('rejects invalid token lifetimes and insecure production cookies', () => {
+    const invalidExpiry = loadEnv({ JWT_EXPIRES_IN: 'seven-days' });
+
+    expect(invalidExpiry.status).toBe(1);
+    expect(invalidExpiry.stderr).toContain('JWT_EXPIRES_IN');
+
+    const insecureProduction = loadEnv({
+      NODE_ENV: 'production',
+      COOKIE_SECURE: 'false',
+    });
+
+    expect(insecureProduction.status).toBe(1);
+    expect(insecureProduction.stderr).toContain('COOKIE_SECURE must be true in production');
   });
 
   it('rejects permissive trust-proxy values', () => {

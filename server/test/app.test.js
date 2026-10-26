@@ -8,6 +8,10 @@ import { errorHandler } from '../src/errors/errorHandler.js';
 import { validateBody, validateObjectIdParam } from '../src/middleware/validate.js';
 
 const validId = '507f1f77bcf86cd799439011';
+const writeHeaders = {
+  Origin: 'http://localhost:5173',
+  'X-Requested-With': 'XMLHttpRequest',
+};
 
 function connectedDatabase() {
   return Promise.resolve({ connected: true, state: 'connected' });
@@ -80,6 +84,7 @@ describe('FLEXI API shell', () => {
     const app = createApp({ databaseHealth: connectedDatabase });
     const response = await request(app)
       .post('/api/health')
+      .set(writeHeaders)
       .set('Content-Type', 'application/json')
       .send('{"broken":');
 
@@ -91,11 +96,40 @@ describe('FLEXI API shell', () => {
     const app = createApp({ databaseHealth: connectedDatabase });
     const response = await request(app)
       .post('/api/health')
+      .set(writeHeaders)
       .set('Content-Type', 'application/json')
       .send({ value: 'x'.repeat(110 * 1024) });
 
     expect(response.status).toBe(413);
     expect(response.body.error.code).toBe('PAYLOAD_TOO_LARGE');
+  });
+
+  it('rejects state-changing requests without CSRF headers', async () => {
+    const app = createApp({ databaseHealth: connectedDatabase });
+
+    const missingOrigin = await request(app)
+      .post('/api/health')
+      .set('X-Requested-With', 'XMLHttpRequest')
+      .send({ value: true });
+
+    expect(missingOrigin.status).toBe(403);
+    expect(missingOrigin.body.error.code).toBe('FORBIDDEN');
+
+    const missingHeader = await request(app)
+      .post('/api/health')
+      .set('Origin', 'http://localhost:5173')
+      .send({ value: true });
+
+    expect(missingHeader.status).toBe(403);
+    expect(missingHeader.body.error.code).toBe('FORBIDDEN');
+
+    const wrongOrigin = await request(app)
+      .post('/api/health')
+      .set({ ...writeHeaders, Origin: 'https://evil.example' })
+      .send({ value: true });
+
+    expect(wrongOrigin.status).toBe(403);
+    expect(wrongOrigin.body.error.code).toBe('FORBIDDEN');
   });
 
   it('allows configured origins and rejects unknown origins', async () => {

@@ -566,6 +566,8 @@ The order follows hard dependencies. Public static pages can begin early, but au
 | Risks and mitigation | Cookie/CORS misconfiguration; use a dev proxy and explicitly test cross-origin production settings |
 | Definition of done | Authentication is secure, tested, and usable from the frontend |
 
+**Authentication status (2026-10-26):** The authentication milestone requested after Phase 2 is implemented. It delivers this phase's auth scope early: register/login/logout/session hydration, bcrypt cost 12, HS256 JWT in an httpOnly cookie, token-version revocation, password change, role/ownership guards, CSRF origin plus custom-header checks, auth-specific rate limits, and the client auth/session/protected-routing flow. See `TEST_PLAN.md` for evidence. Seed data and the Phase 3 live-database checks remain pending.
+
 ### Phase 5 — Public website
 
 | Item | Detail |

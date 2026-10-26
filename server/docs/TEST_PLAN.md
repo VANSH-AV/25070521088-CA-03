@@ -419,12 +419,12 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 
 ### Phase 4 — Auth
 
-- [ ] AUTH-01 through AUTH-12 pass.
-- [ ] Protected route guards work in the UI.
-- [ ] Cookie attributes verified.
-- [ ] Rate limit verified.
+- [x] AUTH-01 through AUTH-12 pass.
+- [x] Protected route guards work in the UI.
+- [x] Cookie attributes verified.
+- [x] Rate limit verified.
 
-**Evidence:** integration test report; browser cookie inspection.
+**Evidence:** 53 backend tests pass, including registration/login/logout/password-change, token tampering/expiry/scope, cookie attributes, CSRF rejection, authorization guards, and login rate limiting. Client lint/build pass. Browser verification covered signup, session persistence after refresh, logout, protected-route redirect with safe `returnTo`, invalid-login errors, and mobile layout. Cookie `Secure` is covered by production environment validation; the browser run used local HTTP cookies. Password show/hide remains a later UI checklist item.
 
 ### Phase 5 — Public site
 
@@ -518,10 +518,10 @@ Do not optimize prematurely; measure after the MVP is functional. A slow query o
 
 ### Auth
 
-- [ ] Signup/login/logout; refresh persists; expired session redirects.
-- [ ] Error messages are clear and do not enumerate accounts.
+- [x] Signup/login/logout; refresh persists; expired session redirects.
+- [x] Error messages are clear and do not enumerate accounts.
 - [ ] Password show/hide and autocomplete work.
-- [ ] Return-to path is internal only.
+- [x] Return-to path is internal only.
 
 ### Project and team
 

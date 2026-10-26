@@ -98,7 +98,7 @@ const userSchema = new Schema(
     },
   },
   {
-    ...baseSchemaOptions(),
+    ...baseSchemaOptions({ hiddenFields: ['tokenVersion'] }),
     collection: 'users',
   },
 );

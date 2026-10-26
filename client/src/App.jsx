@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './auth/context.js';
 import { Icon } from './components/icons.jsx';
 import {
   Alert,
@@ -155,6 +157,9 @@ const features = [
 ];
 
 function App() {
+  const navigate = useNavigate();
+  const { status, user } = useAuth();
+  const isAuthenticated = status === 'authenticated';
   const [menuOpen, setMenuOpen] = useState(false);
   const [savedProjects, setSavedProjects] = useState(() => new Set(['campusloop']));
   const [toast, setToast] = useState(null);
@@ -295,7 +300,7 @@ function App() {
 
       <div className="preview-bar" role="note">
         <span className="preview-bar__tag">Design preview</span>
-        <p>Sample content only. No backend, database, or authentication is connected.</p>
+        <p>Public project content is a sample. Account sign-in is connected and live.</p>
         <a href="#foundation">
           Inspect the system
           <Icon name="arrowRight" size={14} />
@@ -323,27 +328,62 @@ function App() {
               </a>
             ))}
             <div className="site-nav__mobile-actions">
-              <Button
-                variant="secondary"
-                size="sm"
-                fullWidth
-                onClick={() => handlePreviewAction('Sign in')}
-              >
-                Log in
-              </Button>
-              <Button size="sm" fullWidth onClick={() => handlePreviewAction('Sign up')}>
-                Join FLEXI
-              </Button>
+              {isAuthenticated ? (
+                <Button
+                  size="sm"
+                  fullWidth
+                  icon="arrowRight"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Open dashboard
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    fullWidth
+                    onClick={() => navigate('/login')}
+                  >
+                    Log in
+                  </Button>
+                  <Button size="sm" fullWidth onClick={() => navigate('/register')}>
+                    Join FLEXI
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
 
           <div className="site-actions">
-            <Button variant="ghost" size="sm" onClick={() => handlePreviewAction('Sign in')}>
-              Log in
-            </Button>
-            <Button size="sm" icon="arrowUpRight" onClick={() => handlePreviewAction('Sign up')}>
-              Join FLEXI
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <span className="site-user">
+                  <Avatar name={user.name} size={30} decorative />
+                  <span>{user.name.split(/\s+/)[0]}</span>
+                </span>
+                <Button
+                  size="sm"
+                  icon="arrowRight"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Dashboard
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
+                  Log in
+                </Button>
+                <Button
+                  size="sm"
+                  icon="arrowUpRight"
+                  onClick={() => navigate('/register')}
+                >
+                  Join FLEXI
+                </Button>
+              </>
+            )}
           </div>
 
           <button
@@ -987,7 +1027,7 @@ function App() {
             <a href="#top">Back to top</a>
           </nav>
           <div className="site-footer__note">
-            <p>Design-preview content only. No live records or accounts.</p>
+            <p>Project content is a sample. Accounts are live and protected.</p>
             <p>© 2026 FLEXI. Built for student teams.</p>
           </div>
         </div>

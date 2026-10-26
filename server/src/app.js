@@ -1,11 +1,14 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
-import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { env } from './config/env.js';
 import { errorHandler, notFound } from './errors/errorHandler.js';
 import { AppError } from './errors/AppError.js';
+import { csrfProtection } from './middleware/csrf.js';
+import { createRateLimiter } from './middleware/rateLimit.js';
 import { requestId } from './middleware/requestId.js';
+import { createAuthRouter } from './routes/auth.js';
 import { createHealthRouter } from './routes/health.js';
 
 const DEFAULT_WINDOW_MS = 15 * 60 * 1000;
@@ -19,17 +22,11 @@ function corsOrigin(origin, callback) {
   return callback(new AppError(403, 'FORBIDDEN', 'The request origin is not allowed.'));
 }
 
-function rateLimitHandler(req, res, next) {
-  const resetTime = req.rateLimit?.resetTime;
-  const retryAfter = resetTime
-    ? Math.max(1, Math.ceil((new Date(resetTime).getTime() - Date.now()) / 1000))
-    : Math.ceil(DEFAULT_WINDOW_MS / 1000);
-
-  res.setHeader('Retry-After', String(retryAfter));
-  next(new AppError(429, 'RATE_LIMITED', 'Too many requests. Try again later.'));
-}
-
-export function createApp({ databaseHealth, rateLimitOptions = {} } = {}) {
+export function createApp({
+  databaseHealth,
+  rateLimitOptions = {},
+  authRateLimits = {},
+} = {}) {
   const app = express();
 
   app.disable('x-powered-by');
@@ -49,21 +46,22 @@ export function createApp({ databaseHealth, rateLimitOptions = {} } = {}) {
     }),
   );
 
+  app.use(cookieParser());
+
   app.use(
     '/api',
-    rateLimit({
+    createRateLimiter({
       windowMs: DEFAULT_WINDOW_MS,
       limit: DEFAULT_LIMIT,
-      standardHeaders: 'draft-8',
-      legacyHeaders: false,
       ...rateLimitOptions,
-      handler: rateLimitHandler,
     }),
   );
 
+  app.use('/api', csrfProtection);
   app.use(express.json({ limit: '100kb', strict: true }));
 
   app.use('/api', createHealthRouter({ databaseHealth }));
+  app.use('/api/auth', createAuthRouter({ rateLimits: authRateLimits }));
 
   app.use(notFound);
   app.use(errorHandler);

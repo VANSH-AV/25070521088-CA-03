@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import { z } from 'zod';
+import { isDuration } from '../utils/duration.js';
 
 dotenv.config({
   path: fileURLToPath(new URL('../../.env', import.meta.url)),
@@ -26,11 +27,6 @@ const trustProxyFromEnv = z
 
     return z.NEVER;
   });
-
-const optionalSecret = z.preprocess(
-  (value) => (value === '' ? undefined : value),
-  z.string().min(32, 'JWT_SECRET must contain at least 32 characters.').optional(),
-);
 
 const envSchema = z
   .object({
@@ -85,8 +81,11 @@ const envSchema = z
       .max(64)
       .regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/, 'MONGODB_DB_NAME contains invalid characters.')
       .default('flexi_dev'),
-    JWT_SECRET: optionalSecret,
-    JWT_EXPIRES_IN: z.string().min(1).default('7d'),
+    JWT_SECRET: z.string().min(32, 'JWT_SECRET must contain at least 32 characters.'),
+    JWT_EXPIRES_IN: z
+      .string()
+      .default('7d')
+      .refine(isDuration, 'JWT_EXPIRES_IN must use ms, s, m, h, d, or w units.'),
     JWT_ISSUER: z.string().min(1).default('flexi-api'),
     JWT_AUDIENCE: z.string().min(1).default('flexi-web'),
     BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
@@ -102,6 +101,14 @@ const envSchema = z
         code: 'custom',
         path: ['COOKIE_SAME_SITE'],
         message: 'COOKIE_SAME_SITE=none requires COOKIE_SECURE=true.',
+      });
+    }
+
+    if (data.NODE_ENV === 'production' && !data.COOKIE_SECURE) {
+      context.addIssue({
+        code: 'custom',
+        path: ['COOKIE_SECURE'],
+        message: 'COOKIE_SECURE must be true in production.',
       });
     }
   });

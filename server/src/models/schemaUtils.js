@@ -6,7 +6,7 @@ import {
   uniqueObjectIds,
 } from '../utils/validators.js';
 
-export function baseSchemaOptions() {
+export function baseSchemaOptions({ hiddenFields = [] } = {}) {
   return {
     timestamps: true,
     versionKey: false,
@@ -15,6 +15,11 @@ export function baseSchemaOptions() {
       transform(_document, returned) {
         delete returned.passwordHash;
         delete returned.__v;
+
+        for (const field of hiddenFields) {
+          delete returned[field];
+        }
+
         return returned;
       },
     },
