@@ -66,6 +66,39 @@ export const statusLabels = {
   archived: 'Archived',
 };
 
+export const applicationStatusLabels = {
+  pending: 'Pending review',
+  accepted: 'Accepted',
+  rejected: 'Not selected',
+  withdrawn: 'Withdrawn',
+};
+
+export const taskStatusLabels = {
+  todo: 'To do',
+  in_progress: 'In progress',
+  done: 'Done',
+};
+
+export const taskPriorityLabels = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+};
+
+export const milestoneStatusLabels = {
+  planned: 'Planned',
+  active: 'Active',
+  completed: 'Completed',
+};
+
+export function progressPercent(done, total) {
+  if (!total || total < 1) {
+    return 0;
+  }
+
+  return Math.round((done / total) * 100);
+}
+
 export const availabilityLabels = {
   open: 'Open to collaborate',
   limited: 'Limited availability',

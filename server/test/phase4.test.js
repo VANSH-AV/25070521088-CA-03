@@ -629,7 +629,13 @@ describe('project discovery', () => {
       owner: { id: owner.id, name: 'Mira Shah' },
     });
     expect(detail.body.data.project.owner.email).toBeUndefined();
-    expect(detail.body.data.viewer).toEqual({ isOwner: false, canManage: false });
+    expect(detail.body.data.viewer).toMatchObject({
+      isOwner: false,
+      canManage: false,
+      isMember: false,
+      canApply: false,
+      application: null,
+    });
 
     const secondView = await request(app).get(`/api/projects/${project.id}`);
     expect(secondView.body.data.project.views).toBe(2);
@@ -639,7 +645,7 @@ describe('project discovery', () => {
 
     const ownerDraft = await owner.agent.get(`/api/projects/${draft.id}`);
     expect(ownerDraft.status).toBe(200);
-    expect(ownerDraft.body.data.viewer).toEqual({ isOwner: true, canManage: true });
+    expect(ownerDraft.body.data.viewer).toMatchObject({ isOwner: true, canManage: true });
 
     const invalid = await request(app).get('/api/projects/not-an-id');
     expect(invalid.status).toBe(400);

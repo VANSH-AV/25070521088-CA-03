@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext.jsx';
 import { GuestOnlyRoute, ProtectedRoute, StudentRoute } from './auth/RouteGuards.jsx';
 import { AboutPage } from './pages/AboutPage.jsx';
+import { ApplicationsPage } from './pages/ApplicationsPage.jsx';
 import { AuthPage } from './pages/AuthPage.jsx';
 import { ContactPage } from './pages/ContactPage.jsx';
 import { DashboardPage } from './pages/DashboardPage.jsx';
@@ -16,6 +17,7 @@ import { ProjectDetailPage } from './pages/ProjectDetailPage.jsx';
 import { ProjectEditPage } from './pages/ProjectEditPage.jsx';
 import { ProjectsPage } from './pages/ProjectsPage.jsx';
 import { StudentProfilePage } from './pages/StudentProfilePage.jsx';
+import { WorkspacePage } from './pages/WorkspacePage.jsx';
 import './styles/tokens.css';
 import './styles/global.css';
 import './styles/components.css';
@@ -41,6 +43,14 @@ createRoot(document.getElementById('root')).render(
             }
           />
           <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
+          <Route
+            path="/projects/:projectId/workspace"
+            element={
+              <ProtectedRoute>
+                <WorkspacePage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/projects/:projectId/edit"
             element={
@@ -79,6 +89,14 @@ createRoot(document.getElementById('root')).render(
             element={
               <ProtectedRoute>
                 <DashboardProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/applications"
+            element={
+              <ProtectedRoute>
+                <ApplicationsPage />
               </ProtectedRoute>
             }
           />

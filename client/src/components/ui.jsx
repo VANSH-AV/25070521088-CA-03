@@ -10,8 +10,16 @@ const statusMap = {
   pending: { label: 'Pending', tone: 'amber' },
   accepted: { label: 'Accepted', tone: 'mint' },
   rejected: { label: 'Not selected', tone: 'rose' },
+  withdrawn: { label: 'Withdrawn', tone: 'slate' },
   archived: { label: 'Archived', tone: 'slate' },
   hidden: { label: 'Hidden', tone: 'rose' },
+  todo: { label: 'To do', tone: 'slate' },
+  done: { label: 'Done', tone: 'mint' },
+  planned: { label: 'Planned', tone: 'slate' },
+  active: { label: 'Active', tone: 'cobalt' },
+  low: { label: 'Low', tone: 'slate' },
+  medium: { label: 'Medium', tone: 'amber' },
+  high: { label: 'High', tone: 'rose' },
 };
 
 const avatarTones = ['cobalt', 'tangerine', 'mint', 'amber', 'rose', 'ink'];

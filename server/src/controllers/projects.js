@@ -5,6 +5,7 @@ import { Milestone } from '../models/Milestone.js';
 import { Project } from '../models/Project.js';
 import { SavedProject } from '../models/SavedProject.js';
 import { Task } from '../models/Task.js';
+import { isProjectMember } from '../services/projects/access.js';
 import { projectPeople } from '../services/projects/people.js';
 import {
   assertFutureDeadline,
@@ -12,6 +13,7 @@ import {
   canManageProject,
   canViewProject,
   isPublicProject,
+  openSlots,
   PUBLIC_PROJECT_STATUSES,
 } from '../services/projects/policy.js';
 import { exactCaseInsensitive, normalizeText } from '../utils/normalizers.js';
@@ -180,6 +182,25 @@ export async function getProject(req, res) {
   const publicProject = isPublicProject(project);
   const isOwner =
     req.user && String(project.owner?._id || project.owner) === req.user.id;
+  const isMember = Boolean(req.user && isProjectMember(project, req.user.id));
+  const application =
+    req.user && !isOwner
+      ? await Application.findOne({
+          project: project._id,
+          applicant: req.user.id,
+        })
+          .select('status createdAt decidedAt')
+          .lean()
+      : null;
+  const canApply = Boolean(
+    req.user &&
+      req.user.role === 'student' &&
+      project.status === 'recruiting' &&
+      !isOwner &&
+      !isMember &&
+      !application &&
+      openSlots(project) > 0,
+  );
 
   if (publicProject && !isOwner) {
     await Project.updateOne({ _id: project._id }, { $inc: { views: 1 } });
@@ -193,6 +214,17 @@ export async function getProject(req, res) {
       viewer: {
         isOwner: Boolean(isOwner),
         canManage: canManageProject(project, req.user),
+        isMember,
+        isAdmin: req.user?.role === 'admin',
+        canApply,
+        application: application
+          ? {
+              id: String(application._id),
+              status: application.status,
+              createdAt: application.createdAt || null,
+              decidedAt: application.decidedAt || null,
+            }
+          : null,
       },
     },
   });

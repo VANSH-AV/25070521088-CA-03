@@ -9,10 +9,13 @@ import { AppError } from './errors/AppError.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { createRateLimiter } from './middleware/rateLimit.js';
 import { requestId } from './middleware/requestId.js';
+import { createApplicationRouter } from './routes/applications.js';
 import { createAuthRouter } from './routes/auth.js';
 import { createContactRouter } from './routes/contact.js';
 import { createHealthRouter } from './routes/health.js';
+import { createMilestoneRouter } from './routes/milestones.js';
 import { createProjectRouter } from './routes/projects.js';
+import { createTaskRouter } from './routes/tasks.js';
 import { createUserRouter } from './routes/users.js';
 
 const DEFAULT_WINDOW_MS = 15 * 60 * 1000;
@@ -78,6 +81,9 @@ export function createApp({
   app.use('/api/auth', requireDatabase, createAuthRouter({ rateLimits: authRateLimits }));
   app.use('/api/users', requireDatabase, createUserRouter());
   app.use('/api/projects', requireDatabase, createProjectRouter());
+  app.use('/api/applications', requireDatabase, createApplicationRouter());
+  app.use('/api/tasks', requireDatabase, createTaskRouter());
+  app.use('/api/milestones', requireDatabase, createMilestoneRouter());
   app.use('/api/contact', requireDatabase, createContactRouter({ rateLimits: contactRateLimits }));
 
   app.use(notFound);

@@ -5,6 +5,7 @@ import { ApiError } from '../api/client.js';
 import { useAuth } from '../auth/context.js';
 import { PublicLayout } from '../components/PublicLayout.jsx';
 import { Icon } from '../components/icons.jsx';
+import { ApplicationPanel } from '../components/project/ApplicationPanel.jsx';
 import {
   Alert,
   Avatar,
@@ -82,10 +83,16 @@ export function ProjectDetailPage() {
     return () => controller.abort();
   }, [projectId, retryKey]);
 
-  const retry = () => {
+  const reload = (noticeText = '') => {
+    if (noticeText) {
+      setNotice(noticeText);
+    }
+
     setState((current) => ({ ...current, status: 'loading', error: '' }));
     setRetryKey((value) => value + 1);
   };
+
+  const retry = () => reload();
 
   const handleArchive = async () => {
     setArchiving(true);
@@ -166,9 +173,6 @@ export function ProjectDetailPage() {
     ...(project.owner ? [{ ...project.owner, isOwner: true }] : []),
     ...project.members,
   ];
-  const startPath = isAuthenticated
-    ? '/projects/new'
-    : `/login?${new URLSearchParams({ returnTo: '/projects/new' }).toString()}`;
   const isArchived = project.status === 'archived';
   const isDraft = project.status === 'draft';
 
@@ -237,9 +241,25 @@ export function ProjectDetailPage() {
             {viewer.isOwner ? (
               <div className="project-action-card__owner-actions">
                 <p>You own this project.</p>
+                <Link
+                  className="button button--primary button--md button--full"
+                  to={`/projects/${project.id}/workspace`}
+                >
+                  Open workspace
+                  <Icon name="arrowRight" size={17} />
+                </Link>
                 {!isArchived && (
                   <Link
-                    className="button button--primary button--md button--full"
+                    className="button button--secondary button--md button--full"
+                    to={`/projects/${project.id}/workspace?tab=applications`}
+                  >
+                    Review applications
+                    <Icon name="users" size={17} />
+                  </Link>
+                )}
+                {!isArchived && (
+                  <Link
+                    className="button button--secondary button--md button--full"
                     to={`/projects/${project.id}/edit`}
                   >
                     Edit project
@@ -261,19 +281,13 @@ export function ProjectDetailPage() {
                 )}
               </div>
             ) : (
-              <div className="project-action-card__guest">
-                <p>
-                  This page is public. Create your own brief or keep exploring the discovery
-                  board.
-                </p>
-                <Link className="button button--primary button--md button--full" to={startPath}>
-                  Start a project
-                  <Icon name="plus" size={17} />
-                </Link>
-                <Link className="button button--secondary button--md button--full" to="/projects">
-                  Browse projects
-                </Link>
-              </div>
+              <ApplicationPanel
+                project={project}
+                viewer={viewer}
+                user={user}
+                isAuthenticated={isAuthenticated}
+                onChanged={reload}
+              />
             )}
 
             {viewer.isOwner && user && (
@@ -374,7 +388,8 @@ export function ProjectDetailPage() {
               </div>
               {project.members.length === 0 && (
                 <p className="muted-copy">
-                  No teammates have joined yet. This release does not include applications.
+                  No teammates have joined yet. Owners can review applications from the
+                  workspace.
                 </p>
               )}
             </section>

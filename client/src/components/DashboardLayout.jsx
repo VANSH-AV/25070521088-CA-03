@@ -46,6 +46,7 @@ export function DashboardLayout({ children }) {
           >
             My projects
           </Link>
+          <NavLink to="/dashboard/applications">My applications</NavLink>
           <NavLink to="/dashboard/profile">Profile</NavLink>
         </nav>
         <div className="dashboard-header__account">
